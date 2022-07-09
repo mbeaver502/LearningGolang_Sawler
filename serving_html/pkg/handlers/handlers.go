@@ -43,9 +43,3 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 		StringMap: stringMap,
 	})
 }
-
-// RegisterHandlers registers all the handlers for the page routes.
-func (m *Repository) RegisterHandlers() {
-	http.HandleFunc("/", m.Home)
-	http.HandleFunc("/about", m.About)
-}

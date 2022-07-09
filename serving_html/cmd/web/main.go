@@ -17,13 +17,21 @@ func main() {
 
 	repo := handlers.NewRepo(app)
 	handlers.NewHandlers(repo)
-	repo.RegisterHandlers()
 
 	render.NewTemplates(app)
 
 	// Launch a server and start serving requests on localhost:PORT_NUMBER
 	log.Printf("Starting server on port %v\n", PORT_NUMBER)
-	http.ListenAndServe(PORT_NUMBER, nil)
+
+	srv := &http.Server{
+		Addr:    PORT_NUMBER,
+		Handler: routes(app),
+	}
+
+	err := srv.ListenAndServe()
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func setupAppConfig() *config.AppConfig {
