@@ -1,4 +1,4 @@
-package main
+package render
 
 import (
 	"log"
@@ -8,7 +8,7 @@ import (
 )
 
 // renderTemplate renders an HTML template to the given http.ResponseWriter.
-func renderTemplate(w http.ResponseWriter, tmpl string) {
+func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	path := strings.Join([]string{"./templates/", tmpl}, "")
 
 	parsedTemplate, _ := template.ParseFiles(path)
