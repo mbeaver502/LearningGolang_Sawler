@@ -33,6 +33,20 @@ func Hello(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Number of bytes written: %d; Error: %v\n", n, err)
 }
 
+func Divide(w http.ResponseWriter, r *http.Request) {
+	var x, y float32 = 100.0, 0.0
+
+	res, err := divideValues(x, y)
+
+	if err != nil {
+		fmt.Fprintf(w, "%v", err)
+		log.Println("divide error:", err)
+		return
+	}
+
+	fmt.Fprintf(w, "Result: %v / %v = %v", x, y, res)
+}
+
 // main is the program entrypoint.
 func main() {
 	registerHandlers()
@@ -48,6 +62,7 @@ func registerHandlers() {
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/about", About)
 	http.HandleFunc("/hello", Hello)
+	http.HandleFunc("/divide", Divide)
 }
 
 // addValues adds two integers and returns the sum.
@@ -55,4 +70,14 @@ func registerHandlers() {
 // Our addValues func will be unexported, so only package main can access it
 func addValues(x, y int) int {
 	return x + y
+}
+
+// divideValues divides two floating point values.
+// Returns the division result and an error, if any.
+func divideValues(x, y float32) (float32, error) {
+	if y == 0 {
+		return 0, fmt.Errorf("divideValues: cannot divide by zero: %v / %v", x, y)
+	}
+
+	return x / y, nil
 }
