@@ -33,13 +33,6 @@ func Hello(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Number of bytes written: %d; Error: %v\n", n, err)
 }
 
-// addValues adds two integers and returns the sum.
-// Notice that this is a normal function, not a request handler!
-// Our addValues func will be unexported, so only package main can access it
-func addValues(x, y int) int {
-	return x + y
-}
-
 // main is the program entrypoint.
 func main() {
 	registerHandlers()
@@ -55,4 +48,11 @@ func registerHandlers() {
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/about", About)
 	http.HandleFunc("/hello", Hello)
+}
+
+// addValues adds two integers and returns the sum.
+// Notice that this is a normal function, not a request handler!
+// Our addValues func will be unexported, so only package main can access it
+func addValues(x, y int) int {
+	return x + y
 }
