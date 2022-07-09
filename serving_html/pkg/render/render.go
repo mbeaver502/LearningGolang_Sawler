@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/mbeaver502/LearningGolang_Sawler/serving_html/pkg/config"
+	"github.com/mbeaver502/LearningGolang_Sawler/serving_html/pkg/models"
 )
 
 var templateCache = make(map[string]*template.Template)
@@ -81,7 +82,7 @@ func createTemplateCache_v1(t string) error {
 }
 
 // renderTemplate renders an HTML template to the given http.ResponseWriter.
-func RenderTemplate_v3(w http.ResponseWriter, tmpl string) {
+func RenderTemplate_v3(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	// create a template cache -- this creates the cache on every render -- not good!
 	//cache, err := CreateTemplateCache_v2()
 
@@ -102,7 +103,8 @@ func RenderTemplate_v3(w http.ResponseWriter, tmpl string) {
 
 	// let's find out if there's an error when we execute the cached value
 	buf := new(bytes.Buffer)
-	err := t.Execute(buf, nil)
+	td = AddDefaultData(td)
+	err := t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
 	}
@@ -157,4 +159,8 @@ func CreateTemplateCache_v2() (map[string]*template.Template, error) {
 	}
 
 	return cache, nil
+}
+
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+	return td
 }
