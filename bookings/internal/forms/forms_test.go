@@ -66,6 +66,11 @@ func TestForm_MinLength(t *testing.T) {
 		t.Error("shows valid when MinLength on non-existent field")
 	}
 
+	isError := form.Errors.Get("x")
+	if isError == "" {
+		t.Error("shows no error for invalid form")
+	}
+
 	postData = url.Values{}
 	postData.Add("some_field", "some value")
 
@@ -73,6 +78,11 @@ func TestForm_MinLength(t *testing.T) {
 	form.MinLength("some_field", 1)
 	if !form.Valid() {
 		t.Error("shows invalid when MinLength succeeds")
+	}
+
+	isError = form.Errors.Get("some_field")
+	if isError != "" {
+		t.Error("shows error for valid form")
 	}
 
 	form = New(postData)
