@@ -6,10 +6,17 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"strings"
 
 	"github.com/justinas/nosurf"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/pkg/config"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/pkg/models"
+)
+
+const (
+	TEMPLATES_DIRECTORY = "./templates/"
+	TEMPLATE_FILE       = "*.page.tmpl"
+	LAYOUT_FILE         = "*.layout.tmpl"
 )
 
 var app *config.AppConfig
@@ -44,26 +51,29 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 		log.Println(err)
 	}
 
-	// render the template
+	// render the template by writing to the passed-in http.ResponseWriter
 	_, err = buf.WriteTo(w)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
-// createTemplateCache_v2 creates a template cache
+// createTemplateCache creates a template cache
 // this will automatically add all our templates and layouts
 func CreateTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
-	// get all files *.page.tmpl from ./templates/
-	pages, err := filepath.Glob("./templates/*.page.tmpl")
+	templateFiles := strings.Join([]string{TEMPLATES_DIRECTORY, TEMPLATE_FILE}, "")
+	layoutFiles := strings.Join([]string{TEMPLATES_DIRECTORY, LAYOUT_FILE}, "")
+
+	// get all our page template files
+	pages, err := filepath.Glob(templateFiles)
 	if err != nil {
 		log.Println(err)
 		return cache, err
 	}
 
-	// range over all *.page.tmpl files
+	// range over all page template files
 	for _, page := range pages {
 		// get the name of the file itself and parse it as a template with that name
 		name := filepath.Base(page)
@@ -73,16 +83,16 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 			return cache, err
 		}
 
-		// get all our layouts
-		matches, err := filepath.Glob("./templates/*.layout.tmpl")
+		// get all our layout template files
+		layouts, err := filepath.Glob(layoutFiles)
 		if err != nil {
 			log.Println(err)
 			return cache, err
 		}
 
 		// associate any layouts with templates that require them
-		if len(matches) > 0 {
-			ts, err = ts.ParseGlob("./templates/*.layout.tmpl")
+		if len(layouts) > 0 {
+			ts, err = ts.ParseGlob(layoutFiles)
 			if err != nil {
 				log.Println(err)
 				return cache, err
