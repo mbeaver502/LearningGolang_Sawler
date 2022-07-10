@@ -2,6 +2,7 @@ package render
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
@@ -19,7 +20,7 @@ const (
 	LAYOUT_FILE         = "*.layout.tmpl"
 )
 
-var pathToTemplates string
+var pathToTemplates string = TEMPLATES_DIRECTORY
 
 var app *config.AppConfig
 
@@ -29,7 +30,7 @@ func NewTemplates(a *config.AppConfig) {
 }
 
 // renderTemplate renders an HTML template to the given http.ResponseWriter.
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 	var cache map[string]*template.Template
 
 	// get template cache from app config -- create once, read many times!
@@ -42,7 +43,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	// get requested template from cache
 	t, ok := cache[tmpl]
 	if !ok {
-		log.Fatalln("failed to get template from cache")
+		return errors.New("can't get template from cache")
 	}
 
 	// let's find out if there's an error when we execute the cached value
@@ -51,13 +52,17 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	err := t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
+		return err
 	}
 
 	// render the template by writing to the passed-in http.ResponseWriter
 	_, err = buf.WriteTo(w)
 	if err != nil {
 		log.Println(err)
+		return err
 	}
+
+	return nil
 }
 
 // createTemplateCache creates a template cache
