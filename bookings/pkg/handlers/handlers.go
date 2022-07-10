@@ -62,6 +62,8 @@ func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 
 // PostAvailability renders a page with room availabilities.
 func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
+	// Load the user's form values from the request body (i.e., what was POST'd)
+	// Note that the keys must match the form field names
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
 
