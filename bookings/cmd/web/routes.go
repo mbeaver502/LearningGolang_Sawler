@@ -28,12 +28,16 @@ func setupMiddleware(m *chi.Mux) {
 func setupRoutes(m *chi.Mux) {
 	m.Get("/", handlers.Repo.Home)
 	m.Get("/about", handlers.Repo.About)
+	m.Get("/contact", handlers.Repo.Contact)
+
 	m.Get("/generals-quarters", handlers.Repo.Generals)
 	m.Get("/majors-suite", handlers.Repo.Majors)
+
 	m.Get("/make-reservation", handlers.Repo.Reservation)
+
 	m.Get("/search-availability", handlers.Repo.Availability)
 	m.Post("/search-availability", handlers.Repo.PostAvailability)
-	m.Get("/contact", handlers.Repo.Contact)
+	m.Post("/search-availability-json", handlers.Repo.AvailabilityJSON)
 }
 
 func setupFileserver(m *chi.Mux) {
