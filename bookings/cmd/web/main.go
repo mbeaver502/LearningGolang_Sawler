@@ -19,39 +19,53 @@ var app *config.AppConfig
 
 // main is the program entrypoint.
 func main() {
-	app = setupAppConfig()
+	err := run()
 
-	setupSession(app)
-	setupHandlers(app)
-	setupTemplates(app)
-
-	// Launch a server and start serving requests on localhost:PORT_NUMBER
-	log.Printf("Starting server on port %v\n", PORT_NUMBER)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	srv := &http.Server{
 		Addr:    PORT_NUMBER,
 		Handler: routes(app),
 	}
 
-	err := srv.ListenAndServe()
+	// Launch a server and start serving requests on localhost:PORT_NUMBER
+	log.Printf("Starting server on %v\n", srv.Addr)
+
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatalln(err)
 	}
 }
 
-func setupAppConfig() *config.AppConfig {
+func run() error {
+	app, err := setupAppConfig()
+	if err != nil {
+		return err
+	}
+
+	setupSession(app)
+	setupHandlers(app)
+	setupTemplates(app)
+
+	return nil
+}
+
+func setupAppConfig() (*config.AppConfig, error) {
 	var app config.AppConfig
 
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatalln(err)
+		return &app, err
 	}
 
 	app.TemplateCache = tc
 	app.UseCache = false     // change to true when in prod
 	app.InProduction = false // change to true when in prod
 
-	return &app
+	return &app, nil
 }
 
 func setupSession(a *config.AppConfig) {
