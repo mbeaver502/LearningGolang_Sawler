@@ -69,7 +69,6 @@
         {{block "js" .}}
         {{end}}
 
-
         <script>
             let attention = Prompt();
     
@@ -90,6 +89,18 @@
                 })
             }
     
+            {{with .Error}}
+            notify("{{.}}", "error")
+            {{end}}
+    
+            {{with .Flash}}
+            notify("{{.}}", "success")
+            {{end}}
+    
+            {{with .Warning}}
+            notify("{{.}}", "warning")
+            {{end}}
+
             // form input validation
             (() => {
                 'use strict'

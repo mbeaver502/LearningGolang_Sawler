@@ -108,6 +108,9 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 // AddDefaultData adds default data to the value pointed to by td.
 func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
 	td.CSRFToken = nosurf.Token(r)
+	td.Flash = app.Session.PopString(r.Context(), "flash")
+	td.Warning = app.Session.PopString(r.Context(), "warning")
+	td.Error = app.Session.PopString(r.Context(), "error")
 
 	return td
 }
