@@ -53,11 +53,11 @@ func setupAppConfig() *config.AppConfig {
 }
 
 func setupSession(a *config.AppConfig) {
-	app.Session = scs.New()
-	app.Session.Lifetime = 24 * time.Hour
-	app.Session.Cookie.Persist = true
-	app.Session.Cookie.SameSite = http.SameSiteLaxMode
-	app.Session.Cookie.Secure = app.InProduction
+	a.Session = scs.New()
+	a.Session.Lifetime = 24 * time.Hour
+	a.Session.Cookie.Persist = true
+	a.Session.Cookie.SameSite = http.SameSiteLaxMode
+	a.Session.Cookie.Secure = a.InProduction
 }
 
 func setupHandlers(a *config.AppConfig) {
