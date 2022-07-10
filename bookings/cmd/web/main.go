@@ -4,11 +4,13 @@ import (
 	"encoding/gob"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/handlers"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/helpers"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/models"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/render"
 )
@@ -20,7 +22,6 @@ var app *config.AppConfig
 // main is the program entrypoint.
 func main() {
 	err := run()
-
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -41,11 +42,14 @@ func main() {
 
 func run() error {
 	var err error
+
 	app, err = setupAppConfig()
 	if err != nil {
 		return err
 	}
 
+	setupLogging(app)
+	setupHelpers(app)
 	setupSession(app)
 	setupHandlers(app)
 	setupTemplates(app)
@@ -86,4 +90,13 @@ func setupHandlers(a *config.AppConfig) {
 
 func setupTemplates(a *config.AppConfig) {
 	render.NewTemplates(a)
+}
+
+func setupLogging(a *config.AppConfig) {
+	a.InfoLog = log.New(os.Stdout, "INFO:\t", log.Ldate|log.Ltime)
+	a.ErrorLog = log.New(os.Stdout, "ERR:\t", log.Ldate|log.Ltime|log.Lshortfile)
+}
+
+func setupHelpers(a *config.AppConfig) {
+	helpers.NewHelpers(a)
 }
