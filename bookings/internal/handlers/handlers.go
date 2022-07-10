@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/mbeaver502/LearningGolang_Sawler/bookings/pkg/config"
-	"github.com/mbeaver502/LearningGolang_Sawler/bookings/pkg/models"
-	"github.com/mbeaver502/LearningGolang_Sawler/bookings/pkg/render"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/models"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/render"
 )
 
 // Repository is the repository type

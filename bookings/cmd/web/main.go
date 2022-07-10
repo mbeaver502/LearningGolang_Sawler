@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/mbeaver502/LearningGolang_Sawler/bookings/pkg/config"
-	"github.com/mbeaver502/LearningGolang_Sawler/bookings/pkg/handlers"
-	"github.com/mbeaver502/LearningGolang_Sawler/bookings/pkg/render"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/handlers"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/render"
 )
 
 const PORT_NUMBER = ":8080"
