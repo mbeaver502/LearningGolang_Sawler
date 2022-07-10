@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/forms"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/models"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/render"
 )
@@ -44,7 +45,15 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 
 // Reservation renders the make a reservation page and displays form.
 func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "make-reservation.page.tmpl", &models.TemplateData{})
+	render.RenderTemplate(w, r, "make-reservation.page.tmpl",
+		&models.TemplateData{
+			Form: forms.New(nil),
+		})
+}
+
+// PostReservation handles POST request for a reservation form.
+func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
+
 }
 
 // Generals renders the General's Quarters page.
