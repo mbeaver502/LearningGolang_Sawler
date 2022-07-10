@@ -110,6 +110,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        let attention = Prompt();
+
         // set up date range picker
         const elem = document.getElementById("reservation_dates");
         const rangepicker = new DateRangePicker(elem, {
@@ -153,10 +155,72 @@
             })
         })()
 
-        document.getElementById("color_button").addEventListener("click", function(){
-            //notify("clicked!", "success");
-            notifyModal("Title", "Hello World", "info", "Okay");
+        document.getElementById("color_button").addEventListener("click", function() {
+            attention.error({msg:"goodbye world"})
         });
+
+        // create a JS module for firing SweetAlert modals
+        function Prompt() {
+            let toast = function(c) {
+                const {
+                    msg = "",
+                    icon = "success",
+                    position = "top-end", // top right corner
+                } = c;
+
+                const Toast = Swal.mixin({
+                    toast: true,
+                    title: msg,
+                    position: position,
+                    icon: icon,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+
+                Toast.fire({})
+            }
+
+            let success = function(c) {
+                const {
+                    msg = "",
+                    title = "",
+                    footer = "",
+                } = c;
+
+                Swal.fire({
+                    icon: "success",
+                    title: title,
+                    text: msg,
+                    footer: footer,
+                })
+            }
+
+            let error = function(c) {
+                const {
+                    msg = "",
+                    title = "",
+                    footer = "",
+                } = c;
+
+                Swal.fire({
+                    icon: "error",
+                    title: title,
+                    text: msg,
+                    footer: footer,
+                })
+            }
+
+            return {
+                toast: toast,
+                success: success,
+                error: error,
+            }
+        }
     </script>
 </body>
 </html>
