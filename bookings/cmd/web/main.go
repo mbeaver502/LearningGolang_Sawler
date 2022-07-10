@@ -40,7 +40,7 @@ func main() {
 func setupAppConfig() *config.AppConfig {
 	var app config.AppConfig
 
-	tc, err := render.CreateTemplateCache_v2()
+	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatalln(err)
 	}
