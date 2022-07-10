@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -50,6 +51,7 @@ func getRoutes() http.Handler {
 
 	app.Session = session
 
+	setupLogging(&app)
 	NewHandlers(NewRepo(&app))
 	render.NewTemplates(&app)
 
@@ -158,4 +160,9 @@ func CreateTestTemplateCache() (map[string]*template.Template, error) {
 	}
 
 	return cache, nil
+}
+
+func setupLogging(a *config.AppConfig) {
+	a.InfoLog = log.New(os.Stdout, "INFO:\t", log.Ldate|log.Ltime)
+	a.ErrorLog = log.New(os.Stdout, "ERR:\t", log.Ldate|log.Ltime|log.Lshortfile)
 }

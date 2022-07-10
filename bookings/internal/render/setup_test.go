@@ -2,6 +2,7 @@ package render
 
 import (
 	"encoding/gob"
+	"log"
 	"net/http"
 	"os"
 	"testing"
@@ -21,6 +22,7 @@ func (w *mockWriter) WriteHeader(statusCode int)  {}
 func TestMain(m *testing.M) {
 	testApp, _ := setupAppConfig()
 	setupSession(testApp)
+	setupLogging(testApp)
 
 	// set the app in main render package
 	app = testApp
@@ -46,4 +48,9 @@ func setupSession(a *config.AppConfig) {
 	a.Session.Cookie.Persist = true
 	a.Session.Cookie.SameSite = http.SameSiteLaxMode
 	a.Session.Cookie.Secure = a.InProduction
+}
+
+func setupLogging(a *config.AppConfig) {
+	a.InfoLog = log.New(os.Stdout, "INFO:\t", log.Ldate|log.Ltime)
+	a.ErrorLog = log.New(os.Stdout, "ERR:\t", log.Ldate|log.Ltime|log.Lshortfile)
 }
