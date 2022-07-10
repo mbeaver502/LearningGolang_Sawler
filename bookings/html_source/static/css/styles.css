@@ -1,0 +1,16 @@
+.my-footer {
+    background-color: #163b65;
+    color: #ffff;
+    font-size: 80%;
+    margin-top: 1.5em;
+    height: 5em;
+    padding: 1em;
+}
+
+.datepicker {
+    z-index: 10000;
+}
+
+.room-image {
+    max-width: 50%;
+}
