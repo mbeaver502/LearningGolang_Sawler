@@ -2,11 +2,11 @@ package render
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
-	"strings"
 
 	"github.com/justinas/nosurf"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
@@ -14,10 +14,12 @@ import (
 )
 
 const (
-	TEMPLATES_DIRECTORY = "./templates/"
+	TEMPLATES_DIRECTORY = "./templates"
 	TEMPLATE_FILE       = "*.page.tmpl"
 	LAYOUT_FILE         = "*.layout.tmpl"
 )
+
+var pathToTemplates string
 
 var app *config.AppConfig
 
@@ -63,8 +65,8 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 func CreateTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
-	templateFiles := strings.Join([]string{TEMPLATES_DIRECTORY, TEMPLATE_FILE}, "")
-	layoutFiles := strings.Join([]string{TEMPLATES_DIRECTORY, LAYOUT_FILE}, "")
+	templateFiles := fmt.Sprintf("%s/%s", pathToTemplates, TEMPLATE_FILE) //strings.Join([]string{TEMPLATES_DIRECTORY, TEMPLATE_FILE}, "")
+	layoutFiles := fmt.Sprintf("%s/%s", pathToTemplates, LAYOUT_FILE)     // strings.Join([]string{TEMPLATES_DIRECTORY, LAYOUT_FILE}, "")
 
 	// get all our page template files
 	pages, err := filepath.Glob(templateFiles)
