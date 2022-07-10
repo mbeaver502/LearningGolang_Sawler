@@ -40,7 +40,8 @@ func main() {
 }
 
 func run() error {
-	app, err := setupAppConfig()
+	var err error
+	app, err = setupAppConfig()
 	if err != nil {
 		return err
 	}

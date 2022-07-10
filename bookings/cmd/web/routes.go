@@ -9,7 +9,7 @@ import (
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/handlers"
 )
 
-func routes(app *config.AppConfig) http.Handler {
+func routes(ac *config.AppConfig) http.Handler {
 	mux := chi.NewRouter()
 
 	setupMiddleware(mux)
