@@ -35,6 +35,7 @@ func setupRoutes(m *chi.Mux) {
 
 	m.Get("/make-reservation", handlers.Repo.Reservation)
 	m.Post("/make-reservation", handlers.Repo.PostReservation)
+	m.Get("/reservation-summary", handlers.Repo.ReservationSummary)
 
 	m.Get("/search-availability", handlers.Repo.Availability)
 	m.Post("/search-availability", handlers.Repo.PostAvailability)

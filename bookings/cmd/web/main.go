@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"log"
 	"net/http"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/handlers"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/models"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/render"
 )
 
@@ -53,6 +55,9 @@ func setupAppConfig() *config.AppConfig {
 }
 
 func setupSession(a *config.AppConfig) {
+	// what we'll be putting into the session
+	gob.Register(models.Reservation{})
+
 	a.Session = scs.New()
 	a.Session.Lifetime = 24 * time.Hour
 	a.Session.Cookie.Persist = true
