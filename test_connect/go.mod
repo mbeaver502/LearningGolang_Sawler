@@ -1,4 +1,4 @@
-module github.com/mbeaver502/LearningGolang_Sawler
+module github.com/mbeaver502/test_connect
 
 go 1.18
 
