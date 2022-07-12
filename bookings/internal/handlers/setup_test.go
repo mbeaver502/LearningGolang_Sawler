@@ -53,7 +53,7 @@ func getRoutes() http.Handler {
 
 	setupLogging(&app)
 	NewHandlers(NewRepo(&app))
-	render.NewTemplates(&app)
+	render.NewRenderer(&app)
 
 	return routes(&app)
 }

@@ -24,13 +24,13 @@ var pathToTemplates string = TEMPLATES_DIRECTORY
 
 var app *config.AppConfig
 
-// NewTemplates sets the config for the template package
-func NewTemplates(a *config.AppConfig) {
+// NewRenderer sets the config for the render package
+func NewRenderer(a *config.AppConfig) {
 	app = a
 }
 
-// renderTemplate renders an HTML template to the given http.ResponseWriter.
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
+// Template renders an HTML template to the given http.ResponseWriter.
+func Template(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 	var cache map[string]*template.Template
 
 	// get template cache from app config -- create once, read many times!
