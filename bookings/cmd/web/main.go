@@ -80,6 +80,9 @@ func setupAppConfig() (*config.AppConfig, error) {
 func setupSession(a *config.AppConfig) {
 	// what we'll be putting into the session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
 
 	a.Session = scs.New()
 	a.Session.Lifetime = 24 * time.Hour
@@ -93,7 +96,7 @@ func setupHandlers(a *config.AppConfig, db *driver.DB) {
 }
 
 func setupTemplates(a *config.AppConfig) {
-	render.NewTemplates(a)
+	render.NewRenderer(a)
 }
 
 func setupLogging(a *config.AppConfig) {
