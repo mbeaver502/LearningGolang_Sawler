@@ -9,6 +9,7 @@ import (
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/driver"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/handlers"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/helpers"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/models"
@@ -25,6 +26,15 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	db := setupDatabase(app)
+	defer db.SQL.Close()
+
+	setupLogging(app)
+	setupHelpers(app)
+	setupSession(app)
+	setupHandlers(app, db)
+	setupTemplates(app)
 
 	srv := &http.Server{
 		Addr:    PORT_NUMBER,
@@ -47,12 +57,6 @@ func run() error {
 	if err != nil {
 		return err
 	}
-
-	setupLogging(app)
-	setupHelpers(app)
-	setupSession(app)
-	setupHandlers(app)
-	setupTemplates(app)
 
 	return nil
 }
@@ -84,8 +88,8 @@ func setupSession(a *config.AppConfig) {
 	a.Session.Cookie.Secure = a.InProduction
 }
 
-func setupHandlers(a *config.AppConfig) {
-	handlers.NewHandlers(handlers.NewRepo(a))
+func setupHandlers(a *config.AppConfig, db *driver.DB) {
+	handlers.NewHandlers(handlers.NewRepo(a, db))
 }
 
 func setupTemplates(a *config.AppConfig) {
@@ -99,4 +103,17 @@ func setupLogging(a *config.AppConfig) {
 
 func setupHelpers(a *config.AppConfig) {
 	helpers.NewHelpers(a)
+}
+
+func setupDatabase(a *config.AppConfig) *driver.DB {
+	log.Println("Connecting to database...")
+
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=postgres password=password")
+	if err != nil {
+		log.Fatalln("Failed to connect to database", err)
+	}
+
+	log.Println("Connected to database.")
+
+	return db
 }

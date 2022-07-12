@@ -6,24 +6,29 @@ import (
 	"net/http"
 
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/driver"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/forms"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/helpers"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/models"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/render"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/repository"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/repository/dbrepo"
 )
 
 // Repository is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // Repo is the repository used by the handlers
 var Repo *Repository
 
 // NewRepo creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
