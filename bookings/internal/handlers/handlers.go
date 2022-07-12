@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/driver"
@@ -70,6 +72,29 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// See: https://www.pauladamsmith.com/blog/2011/05/go_time.html
+	// Go time format reference: 01/02 03:04:05PM '06 -0700
+	sd := r.Form.Get("start_date")
+	ed := r.Form.Get("end_date")
+
+	// Our form passes start_date and end_date in YYYY-MM-DD format.
+	layout := "2006-01-02"
+
+	startDate, err := time.Parse(layout, sd)
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+
+	endDate, err := time.Parse(layout, ed)
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+
+	roomID, err := strconv.Atoi(r.Form.Get("room_id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+
 	// Save the info that the user gave us in the form
 	// We'll use this to re-populate the form if there were validation issues
 	reservation := models.Reservation{
@@ -77,6 +102,9 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		LastName:  r.Form.Get("last_name"),
 		Email:     r.Form.Get("email"),
 		Phone:     r.Form.Get("phone"),
+		StartDate: startDate,
+		EndDate:   endDate,
+		RoomID:    roomID,
 	}
 
 	form := forms.New(r.PostForm)
@@ -97,6 +125,12 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 			})
 
 		return
+	}
+
+	// Save the user's reservation to the database.
+	err = m.DB.InsertReservation(reservation)
+	if err != nil {
+		helpers.ServerError(w, err)
 	}
 
 	m.App.Session.Put(r.Context(), "reservation", reservation)
