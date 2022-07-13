@@ -42,6 +42,7 @@ func setupRoutes(m *chi.Mux) {
 	m.Post("/search-availability-json", handlers.Repo.AvailabilityJSON)
 
 	m.Get("/choose-room/{id}", handlers.Repo.ChooseRoom)
+	m.Get("/book-room", handlers.Repo.BookRoom)
 }
 
 func setupFileserver(m *chi.Mux) {
