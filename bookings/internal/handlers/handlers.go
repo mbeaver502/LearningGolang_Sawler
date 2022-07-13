@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -159,6 +160,46 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		m.App.Session.Put(r.Context(), "error", "failed to insert room restriction record")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
+	}
+
+	// send confirmation emails via channel
+	htmlMsg := fmt.Sprintf(`
+		<strong>Reservation Confirmation</strong><br>
+		Dear %s,<br>
+		This is to confirm your reservation from %s to %s.<br>
+		Thank you!`,
+		reservation.FirstName,
+		reservation.StartDate.Format("2006-01-02"),
+		reservation.EndDate.Format("2006-01-02"))
+
+	m.App.MailChan <- models.MailData{
+		To:      reservation.Email,
+		From:    "owner@example.com",
+		Subject: "Reservation Confirmation",
+		Content: htmlMsg,
+	}
+
+	htmlMsg = fmt.Sprintf(`
+		<strong>Reservation Confirmation</strong><br>
+		Guest: %s %s<br>
+		Email: %s<br>
+		Phone: %s<br>
+		Arrival: %s<br>
+		Departure: %s.<br>
+		Room: %d<br>`,
+		reservation.FirstName,
+		reservation.LastName,
+		reservation.Email,
+		reservation.Phone,
+		reservation.StartDate.Format("2006-01-02"),
+		reservation.EndDate.Format("2006-01-02"),
+		reservation.RoomID)
+
+	m.App.MailChan <- models.MailData{
+		To:      "owner@example.com",
+		From:    "mail_server@example.com",
+		Subject: "Reservation Confirmation",
+		Content: htmlMsg,
 	}
 
 	m.App.Session.Put(r.Context(), "reservation", reservation)
