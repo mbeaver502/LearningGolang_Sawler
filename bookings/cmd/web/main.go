@@ -26,6 +26,8 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	defer close(app.MailChan)
+	listenForMail()
 
 	db := setupDatabase(app)
 	defer db.SQL.Close()
@@ -73,6 +75,9 @@ func setupAppConfig() (*config.AppConfig, error) {
 	app.TemplateCache = tc
 	app.UseCache = false     // change to true when in prod
 	app.InProduction = false // change to true when in prod
+
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
 
 	return &app, nil
 }
