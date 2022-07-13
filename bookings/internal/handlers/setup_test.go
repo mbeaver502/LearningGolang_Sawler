@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"testing"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
@@ -30,7 +31,7 @@ const (
 
 var pathToTemplates string = "./../../templates"
 
-func getRoutes() http.Handler {
+func TestMain(m *testing.M) {
 	tc, err := CreateTestTemplateCache()
 	if err != nil {
 		log.Fatalln(err)
@@ -52,10 +53,11 @@ func getRoutes() http.Handler {
 	app.Session = session
 
 	setupLogging(&app)
-	NewHandlers(NewRepo(&app))
+	NewHandlers(NewTestRepo(&app))
 	render.NewRenderer(&app)
+	routes(&app)
 
-	return routes(&app)
+	os.Exit(m.Run())
 }
 
 func routes(app *config.AppConfig) http.Handler {
