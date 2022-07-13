@@ -7,6 +7,8 @@ import (
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/models"
 )
 
+const DEFAULT_TIMEOUT = 3 * time.Second
+
 func (m *postgresDBRepo) AllUsers() bool {
 
 	return true
@@ -21,7 +23,7 @@ func (m *postgresDBRepo) InsertReservation(res models.Reservation) (int, error) 
 				returning id`
 
 	// Use a context so that we can timeout any transactions that exceed a certain time limit.
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
 	defer cancel()
 
 	var newID int
@@ -52,7 +54,7 @@ func (m *postgresDBRepo) InsertRoomRestriction(r models.RoomRestriction) error {
 				values ($1, $2, $3, $4, $5, $6, $7)`
 
 	// Use a context so that we can timeout any transactions that exceed a certain time limit.
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
 	defer cancel()
 
 	_, err := m.DB.ExecContext(ctx, stmt,
@@ -77,7 +79,7 @@ func (m *postgresDBRepo) SearchAvailabilityByDatesByRoomID(start time.Time, end 
 	query := `select count(id) from room_restrictions where $1 < end_date and $2 > start_date and room_id = $3`
 
 	// Use a context so that we can timeout any transactions that exceed a certain time limit.
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
 	defer cancel()
 
 	var numRows int
@@ -96,7 +98,7 @@ func (m *postgresDBRepo) SearchAvailabilityForAllRooms(start time.Time, end time
 				select rr.room_id from room_restrictions rr where $1 < rr.end_date and $2 > rr.start_date)`
 
 	// Use a context so that we can timeout any transactions that exceed a certain time limit.
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
 	defer cancel()
 
 	var rooms []models.Room
@@ -122,4 +124,22 @@ func (m *postgresDBRepo) SearchAvailabilityForAllRooms(start time.Time, end time
 	}
 
 	return rooms, nil
+}
+
+// GetRoomByID gets a room by the given id.
+func (m *postgresDBRepo) GetRoomByID(id int) (models.Room, error) {
+	query := `select id, room_name, created_at, updated_at from rooms where id = $1`
+
+	// Use a context so that we can timeout any transactions that exceed a certain time limit.
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
+	defer cancel()
+
+	var room models.Room
+	err := m.DB.QueryRowContext(ctx, query, id).Scan(&room.ID, &room.RoomName, &room.CreatedAt, &room.UpdatedAt)
+	if err != nil {
+		return room, err
+	}
+
+	return room, nil
+
 }
