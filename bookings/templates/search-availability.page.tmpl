@@ -36,6 +36,7 @@
     const elem = document.getElementById("reservation_dates");
     const rangepicker = new DateRangePicker(elem, {
         format: "yyyy-mm-dd",
+        minDate: new Date(), // set the min date to today's date
     }); 
 </script>
 {{end}}
