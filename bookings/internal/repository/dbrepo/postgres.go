@@ -2,9 +2,11 @@ package dbrepo
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const DEFAULT_TIMEOUT = 3 * time.Second
@@ -141,5 +143,86 @@ func (m *postgresDBRepo) GetRoomByID(id int) (models.Room, error) {
 	}
 
 	return room, nil
+}
 
+// GetUserByID returns a user by id.
+func (m *postgresDBRepo) GetUserByID(id int) (models.User, error) {
+	// Use a context so that we can timeout any transactions that exceed a certain time limit.
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
+	defer cancel()
+
+	query := `select id, first_name, last_name, email, password, access_level, created_at, updated_at
+				from users where id = $1`
+
+	var u models.User
+	err := m.DB.QueryRowContext(ctx, query,
+		id,
+	).Scan(
+		&u.ID,
+		&u.FirstName,
+		&u.LastName,
+		&u.Email,
+		&u.Password,
+		&u.AccessLevel,
+		&u.CreatedAt,
+		&u.UpdatedAt,
+	)
+	if err != nil {
+		return u, err
+	}
+
+	return u, nil
+}
+
+// UpdateUser updates a user in the database.
+func (m *postgresDBRepo) UpdateUser(u models.User) error {
+	// Use a context so that we can timeout any transactions that exceed a certain time limit.
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
+	defer cancel()
+
+	query := `update users set first_name = $1, last_name = $2, email = $3, access_level = $4, updated_at = $5`
+
+	_, err := m.DB.ExecContext(ctx, query,
+		u.FirstName,
+		u.LastName,
+		u.Email,
+		u.AccessLevel,
+		time.Now(),
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Authenticate authenticates a user.
+func (m *postgresDBRepo) Authenticate(email, testPassword string) (int, string, error) {
+	// Use a context so that we can timeout any transactions that exceed a certain time limit.
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
+	defer cancel()
+
+	// the ID of the authenticated user, if successful
+	var id int
+	var hashedPassword string
+
+	query := `select id, password from users where email = $1`
+	err := m.DB.QueryRowContext(ctx, query,
+		email,
+	).Scan(
+		&id,
+		&hashedPassword,
+	)
+	if err != nil {
+		return id, "", err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(testPassword))
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return 0, "", errors.New("incorrect password")
+	} else if err != nil {
+		return 0, "", err
+	}
+
+	return id, hashedPassword, nil
 }

@@ -43,6 +43,16 @@ func setupRoutes(m *chi.Mux) {
 
 	m.Get("/choose-room/{id}", handlers.Repo.ChooseRoom)
 	m.Get("/book-room", handlers.Repo.BookRoom)
+
+	m.Get("/user/login", handlers.Repo.ShowLogin)
+	m.Post("/user/login", handlers.Repo.PostShowLogin)
+	m.Get("/user/logout", handlers.Repo.Logout)
+
+	// Allow only authenticated users to access /admin/<route>
+	m.Route("/admin", func(m chi.Router) {
+		m.Use(Auth)
+		m.Get("/dashboard", handlers.Repo.AdminDashboard)
+	})
 }
 
 func setupFileserver(m *chi.Mux) {

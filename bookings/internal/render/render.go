@@ -11,6 +11,7 @@ import (
 
 	"github.com/justinas/nosurf"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/helpers"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/models"
 )
 
@@ -118,6 +119,10 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 	td.Flash = app.Session.PopString(r.Context(), "flash")
 	td.Warning = app.Session.PopString(r.Context(), "warning")
 	td.Error = app.Session.PopString(r.Context(), "error")
+
+	if helpers.IsAuthenticated(r) {
+		td.IsAuthenticated = 1
+	}
 
 	return td
 }

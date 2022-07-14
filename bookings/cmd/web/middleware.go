@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/justinas/nosurf"
+	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/helpers"
 )
 
 // NoSurf adds CSRF protection to all POST requests.
@@ -23,4 +24,16 @@ func NoSurf(next http.Handler) http.Handler {
 // SessionLoad loads and saves the session on every request.
 func SessionLoad(next http.Handler) http.Handler {
 	return app.Session.LoadAndSave(next)
+}
+
+func Auth(next http.Handler) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if !helpers.IsAuthenticated(r) {
+				app.Session.Put(r.Context(), "error", "Please log in first!")
+				http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+			}
+
+			next.ServeHTTP(w, r)
+		})
 }
