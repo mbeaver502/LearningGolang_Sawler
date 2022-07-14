@@ -57,7 +57,20 @@ func TestMain(m *testing.M) {
 	render.NewRenderer(&app)
 	routes(&app)
 
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
+	defer close(app.MailChan)
+	listenForMail()
+
 	os.Exit(m.Run())
+}
+
+func listenForMail() {
+	go func() {
+		for {
+			_ = <-app.MailChan
+		}
+	}()
 }
 
 func routes(app *config.AppConfig) http.Handler {
