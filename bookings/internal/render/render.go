@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/justinas/nosurf"
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/config"
@@ -25,9 +26,18 @@ var pathToTemplates string = TEMPLATES_DIRECTORY
 
 var app *config.AppConfig
 
+var functions = template.FuncMap{
+	"humanDate": HumanDate,
+}
+
 // NewRenderer sets the config for the render package
 func NewRenderer(a *config.AppConfig) {
 	app = a
+}
+
+// HumanDate returns time in YYYY-MM-DD format.
+func HumanDate(t time.Time) string {
+	return t.Format("2006-01-02")
 }
 
 // Template renders an HTML template to the given http.ResponseWriter.
