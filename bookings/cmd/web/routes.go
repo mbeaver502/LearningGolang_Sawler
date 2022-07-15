@@ -52,6 +52,9 @@ func setupRoutes(m *chi.Mux) {
 	m.Route("/admin", func(m chi.Router) {
 		m.Use(Auth)
 		m.Get("/dashboard", handlers.Repo.AdminDashboard)
+		m.Get("/reservations-new", handlers.Repo.AdminNewReservations)
+		m.Get("/reservations-all", handlers.Repo.AdminAllReservations)
+		m.Get("/reservations-calendar", handlers.Repo.AdminReservationsCalendar)
 	})
 }
 
