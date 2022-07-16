@@ -14,6 +14,7 @@
         <!-- plugin css for this page -->
         <!-- End plugin css for this page -->
         <!-- inject:css -->
+        <link rel="stylesheet" type="text/css" href="https://unpkg.com/notie/dist/notie.min.css">
         <link rel="stylesheet" href="/static/admin/css/style.css">
         <!-- endinject -->
         <link rel="shortcut icon" href="/static/admin/images/favicon.png"/>
@@ -22,8 +23,13 @@
             .content-wrapper {
                 background: white;
             }
+
             label {
                 font-weight: bold;
+            }
+
+            .notie-container {
+                z-index: 50000;
             }
         </style>
         {{block "css" . }}
@@ -134,10 +140,66 @@
     <script src="/static/admin/js/hoverable-collapse.js"></script>
     <script src="/static/admin/js/template.js"></script>
     <script src="/static/admin/js/todolist.js"></script>
+    <script src="https://unpkg.com/notie"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/static/js/app.js"></script>
     <!-- endinject -->
     <!-- Custom js for this page-->
     <script src="/static/admin/js/dashboard.js"></script>
     <!-- End custom js for this page-->
+
+    <script>
+        let attention = Prompt();
+
+        // custom alerting using notie
+        function notify(msg, msgType) {
+            notie.alert({
+                type: msgType,
+                text: msg,
+            })
+        }
+
+        function notifyModal(title, html, icon, confirmButtonText) {
+            Swal.fire({
+                title: title,
+                html: html,
+                icon: icon,
+                confirmButtonText: confirmButtonText
+            })
+        }
+
+        {{with .Error}}
+        notify("{{.}}", "error")
+        {{end}}
+
+        {{with .Flash}}
+        notify("{{.}}", "success")
+        {{end}}
+
+        {{with .Warning}}
+        notify("{{.}}", "warning")
+        {{end}}
+
+        // form input validation
+        (() => {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            const forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
 
     {{block "js" . }}
 
