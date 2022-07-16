@@ -82,6 +82,7 @@
             <a href="/admin/reservations-{{$src}}" class="btn btn-warning">Cancel</a>
             <a href="#!" class="btn btn-info" onclick="processRes({{$res.ID}})">Mark as Processed</a>
 
+            <a href="#!" class="btn btn-danger" onclick="deleteRes({{$res.ID}})">Delete</a>
         </form>
     </div>
 {{end}}
@@ -95,6 +96,18 @@
                 callback: function(result) {
                     if (result !== false) {
                         window.location.href = "/admin/process-reservation/{{$src}}/" + id;
+                    }
+                }
+            })
+        }
+
+        function deleteRes(id) {
+            attention.custom({
+                icon: "warning",
+                msg: "Are you sure?",
+                callback: function(result) {
+                    if (result !== false) {
+                        window.location.href = "/admin/delete-reservation/{{$src}}/" + id;
                     }
                 }
             })
