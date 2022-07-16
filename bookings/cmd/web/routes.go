@@ -59,6 +59,7 @@ func setupRoutes(m *chi.Mux) {
 		m.Get("/reservations-calendar", handlers.Repo.AdminReservationsCalendar)
 
 		m.Get("/reservations/{src}/{id}", handlers.Repo.AdminShowReservation)
+		m.Post("/reservations/{src}/{id}", handlers.Repo.AdminPostShowReservation)
 	})
 }
 
