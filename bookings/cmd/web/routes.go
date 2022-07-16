@@ -60,6 +60,7 @@ func setupRoutes(m *chi.Mux) {
 
 		m.Get("/reservations/{src}/{id}", handlers.Repo.AdminShowReservation)
 		m.Post("/reservations/{src}/{id}", handlers.Repo.AdminPostShowReservation)
+		m.Get("/process-reservation/{src}/{id}", handlers.Repo.AdminProcessReservation)
 	})
 }
 
