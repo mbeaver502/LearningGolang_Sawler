@@ -31,6 +31,13 @@ const (
 
 var pathToTemplates string = "./../../templates"
 
+var functions = template.FuncMap{
+	"humanDate":  render.HumanDate,
+	"iterate":    render.Iterate,
+	"add":        render.Add,
+	"formatDate": render.FormatDate,
+}
+
 func TestMain(m *testing.M) {
 	tc, err := CreateTestTemplateCache()
 	if err != nil {
@@ -43,6 +50,10 @@ func TestMain(m *testing.M) {
 
 	// what we'll be putting into the session
 	gob.Register(models.Reservation{})
+	gob.Register(models.User{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
+	gob.Register(map[string]int{})
 
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
@@ -149,7 +160,7 @@ func CreateTestTemplateCache() (map[string]*template.Template, error) {
 	for _, page := range pages {
 		// get the name of the file itself and parse it as a template with that name
 		name := filepath.Base(page)
-		ts, err := template.New(name).ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			log.Println(err)
 			return cache, err
