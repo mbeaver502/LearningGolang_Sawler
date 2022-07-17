@@ -50,7 +50,7 @@ func setupRoutes(m *chi.Mux) {
 
 	// Allow only authenticated users to access /admin/<route>
 	m.Route("/admin", func(m chi.Router) {
-		//m.Use(Auth)
+		m.Use(Auth)
 
 		m.Get("/dashboard", handlers.Repo.AdminDashboard)
 
