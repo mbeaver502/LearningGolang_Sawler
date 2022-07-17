@@ -88,6 +88,7 @@ func setupSession(a *config.AppConfig) {
 	gob.Register(models.User{})
 	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
+	gob.Register(map[string]int{})
 
 	a.Session = scs.New()
 	a.Session.Lifetime = 24 * time.Hour

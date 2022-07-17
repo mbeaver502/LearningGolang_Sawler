@@ -57,12 +57,12 @@ func setupRoutes(m *chi.Mux) {
 		m.Get("/reservations-new", handlers.Repo.AdminNewReservations)
 		m.Get("/reservations-all", handlers.Repo.AdminAllReservations)
 		m.Get("/reservations-calendar", handlers.Repo.AdminReservationsCalendar)
+		m.Post("/reservations-calendar", handlers.Repo.AdminPostReservationsCalendar)
 
-		m.Get("/reservations/{src}/{id}", handlers.Repo.AdminShowReservation)
+		m.Get("/reservations/{src}/{id}/show", handlers.Repo.AdminShowReservation)
 		m.Post("/reservations/{src}/{id}", handlers.Repo.AdminPostShowReservation)
-		m.Get("/process-reservation/{src}/{id}", handlers.Repo.AdminProcessReservation)
-
-		m.Get("/delete-reservation/{src}/{id}", handlers.Repo.AdminDeleteReservation)
+		m.Get("/process-reservation/{src}/{id}/do", handlers.Repo.AdminProcessReservation)
+		m.Get("/delete-reservation/{src}/{id}/do", handlers.Repo.AdminDeleteReservation)
 	})
 }
 

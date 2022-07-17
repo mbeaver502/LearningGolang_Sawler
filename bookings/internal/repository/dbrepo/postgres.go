@@ -3,6 +3,7 @@ package dbrepo
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/mbeaver502/LearningGolang_Sawler/bookings/internal/models"
@@ -450,6 +451,127 @@ func (m *postgresDBRepo) UpdateProcessedForReservation(id int, processed int) er
 
 	_, err := m.DB.ExecContext(ctx, query, processed, id)
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// AllRooms returns all rooms in the database.
+func (m *postgresDBRepo) AllRooms() ([]models.Room, error) {
+	// Use a context so that we can timeout any transactions that exceed a certain time limit.
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
+	defer cancel()
+
+	var rooms []models.Room
+
+	query := `select id, room_name, created_at, updated_at from rooms order by room_name`
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return rooms, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var rm models.Room
+
+		err := rows.Scan(&rm.ID, &rm.RoomName, &rm.CreatedAt, &rm.UpdatedAt)
+		if err != nil {
+			return rooms, err
+		}
+
+		rooms = append(rooms, rm)
+	}
+
+	if err = rows.Err(); err != nil {
+		return rooms, err
+	}
+
+	return rooms, nil
+}
+
+// GetRestrctionsForRoomByDate returns all restrictions for a given room over a given date range.
+func (m *postgresDBRepo) GetRestrctionsForRoomByDate(id int, start time.Time, end time.Time) ([]models.RoomRestriction, error) {
+	// Use a context so that we can timeout any transactions that exceed a certain time limit.
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
+	defer cancel()
+
+	var restrictions []models.RoomRestriction
+
+	query := `select id, coalesce(reservation_id, 0), restriction_id, room_id, start_date, end_date 
+		from room_restrictions 
+		where $1 < end_date and $2 >= start_date and room_id = $3`
+
+	rows, err := m.DB.QueryContext(ctx, query, start, end, id)
+	if err != nil {
+		return restrictions, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var r models.RoomRestriction
+
+		err := rows.Scan(
+			&r.ID,
+			&r.ReservationID,
+			&r.RestrictionID,
+			&r.RoomID,
+			&r.StartDate,
+			&r.EndDate,
+		)
+
+		if err != nil {
+			return restrictions, err
+		}
+
+		restrictions = append(restrictions, r)
+	}
+
+	if err = rows.Err(); err != nil {
+		return restrictions, err
+	}
+
+	return restrictions, nil
+}
+
+// InsertBlockForRoom inserts a room restriction.
+func (m *postgresDBRepo) InsertBlockForRoom(id int, startDate time.Time) error {
+	// Use a context so that we can timeout any transactions that exceed a certain time limit.
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
+	defer cancel()
+
+	query := `insert into room_restrictions (start_date, end_date, room_id, restriction_id, created_at, updated_at)
+		values ($1, $2, $3, $4, $5, $6)`
+
+	_, err := m.DB.ExecContext(ctx, query,
+		startDate,
+		startDate.AddDate(0, 0, 1),
+		id, 2,
+		time.Now(),
+		time.Now(),
+	)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+// DeleteBlockByID deletes a room restriction.
+func (m *postgresDBRepo) DeleteBlockByID(id int) error {
+	// Use a context so that we can timeout any transactions that exceed a certain time limit.
+	ctx, cancel := context.WithTimeout(context.Background(), DEFAULT_TIMEOUT)
+	defer cancel()
+
+	query := `delete from room_restrictions where id = $1`
+
+	_, err := m.DB.ExecContext(ctx, query,
+		id,
+	)
+	if err != nil {
+		log.Println(err)
 		return err
 	}
 

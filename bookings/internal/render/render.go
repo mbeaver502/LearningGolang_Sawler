@@ -27,7 +27,10 @@ var pathToTemplates string = TEMPLATES_DIRECTORY
 var app *config.AppConfig
 
 var functions = template.FuncMap{
-	"humanDate": HumanDate,
+	"humanDate":  HumanDate,
+	"iterate":    Iterate,
+	"add":        Add,
+	"formatDate": FormatDate,
 }
 
 // NewRenderer sets the config for the render package
@@ -95,7 +98,7 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	for _, page := range pages {
 		// get the name of the file itself and parse it as a template with that name
 		name := filepath.Base(page)
-		ts, err := template.New(name).ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			log.Println(err)
 			return cache, err
@@ -135,4 +138,24 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 	}
 
 	return td
+}
+
+// Iterate returns a slice of ints starting at 1 going to count
+func Iterate(count int) []int {
+	var items []int
+
+	for i := 0; i < count; i++ {
+		items = append(items, i)
+	}
+
+	return items
+}
+
+// Add adds two integers.
+func Add(a, b int) int {
+	return a + b
+}
+
+func FormatDate(t time.Time, f string) string {
+	return t.Format(f)
 }

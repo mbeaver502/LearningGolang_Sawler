@@ -97,3 +97,27 @@ func (m *testDBRepo) DeleteReservation(id int) error {
 func (m *testDBRepo) UpdateProcessedForReservation(id int, processed int) error {
 	return nil
 }
+
+// AllRooms returns all rooms in the database.
+func (m *testDBRepo) AllRooms() ([]models.Room, error) {
+	var rooms []models.Room
+
+	return rooms, nil
+}
+
+// GetRestrctionsForRoomByDate returns all restrictions for a given room over a given date range.
+func (m *testDBRepo) GetRestrctionsForRoomByDate(id int, start time.Time, end time.Time) ([]models.RoomRestriction, error) {
+	var restrictions []models.RoomRestriction
+
+	return restrictions, nil
+}
+
+// InsertBlockForRoom inserts a room restriction.
+func (m *testDBRepo) InsertBlockForRoom(id int, startDate time.Time) error {
+	return nil
+}
+
+// DeleteBlockByID deletes a room restriction.
+func (m *testDBRepo) DeleteBlockByID(id int) error {
+	return nil
+}
