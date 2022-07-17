@@ -2,6 +2,9 @@ package main
 
 import (
 	"encoding/gob"
+	"errors"
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -22,6 +25,21 @@ var app *config.AppConfig
 
 // main is the program entrypoint.
 func main() {
+	// read flags
+	inProduction := flag.Bool("production", true, "Application is in Production")
+	useCache := flag.Bool("cache", true, "Use cached templates")
+	dbHost := flag.String("dbhost", "localhost", "Database host")
+	dbName := flag.String("dbname", "", "Database name")
+	dbPort := flag.String("dbport", "5432", "Database port")
+	dbUser := flag.String("dbuser", "", "Database user")
+	dbPass := flag.String("dbpass", "", "Database password")
+	dbSSL := flag.String("dbssl", "disable", "Database SSL settings (disable, prefer, require)")
+
+	flag.Parse()
+	if *dbName == "" || *dbUser == "" {
+		log.Fatalln(errors.New("missing required flags"))
+	}
+
 	err := run()
 	if err != nil {
 		log.Fatalln(err)
@@ -29,7 +47,12 @@ func main() {
 	defer close(app.MailChan)
 	listenForMail()
 
-	db := setupDatabase(app)
+	app.InProduction = *inProduction
+	app.UseCache = *useCache
+
+	connString := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=%s", *dbHost, *dbPort, *dbName, *dbUser, *dbPass, *dbSSL)
+
+	db := setupDatabase(app, connString)
 	defer db.SQL.Close()
 
 	setupLogging(app)
@@ -73,8 +96,6 @@ func setupAppConfig() (*config.AppConfig, error) {
 	}
 
 	app.TemplateCache = tc
-	app.UseCache = false     // change to true when in prod
-	app.InProduction = false // change to true when in prod
 
 	mailChan := make(chan models.MailData)
 	app.MailChan = mailChan
@@ -114,10 +135,10 @@ func setupHelpers(a *config.AppConfig) {
 	helpers.NewHelpers(a)
 }
 
-func setupDatabase(a *config.AppConfig) *driver.DB {
+func setupDatabase(a *config.AppConfig, connString string) *driver.DB {
 	log.Println("Connecting to database...")
 
-	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bookings user=postgres password=password")
+	db, err := driver.ConnectSQL(connString)
 	if err != nil {
 		log.Fatalln("Failed to connect to database", err)
 	}
