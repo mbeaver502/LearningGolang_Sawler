@@ -40,13 +40,16 @@
                     </div>
 
                     <hr>
+
                     <a href="javascript:void(0);" class="btn btn-outline-secondary" id="sendBtn">Send Message</a>
 
                     <input type="hidden" name="action" id="action">
 
-                    <hr>
+                    <div id="status" class="mt-2 float-end">
 
-                    <div id="output" class="chatbox">
+                    </div>
+
+                    <div id="output" class="mt-2 chatbox">
 
                     </div>
                 </div>
@@ -85,18 +88,25 @@
     // When the DOM is loaded on this page, try to establish a WebSocket connection
     // to our server, which is listening on localhost:8080.
     document.addEventListener("DOMContentLoaded", function () {
-        socket = new ReconnectingWebSocket("ws://127.0.0.1:8080/ws", null, {debug: true, reconnectInterval: 3000});
+        socket = new ReconnectingWebSocket("ws://127.0.0.1:8080/ws", null, { debug: true, reconnectInterval: 3000 });
+
+        const offline = `<span class="badge bg-danger">Offline</span>`;
+        const online = `<span class="badge bg-success">Connected</span>`;
+        let statusDiv = document.getElementById("status");
 
         socket.onopen = () => {
             console.log("successfully connected");
+            statusDiv.innerHTML = online;
         }
 
         socket.onclose = () => {
             console.log("connection closed");
+            statusDiv.innerHTML = offline;
         }
 
         socket.onerror = error => {
             console.log("encountered an error");
+            statusDiv.innerHTML = offline;
         }
 
         socket.onmessage = msg => {
