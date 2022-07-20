@@ -1,0 +1,2 @@
+go build -o vigilate.exe ./cmd/web/.
+vigilate -dbuser='postgres' -dbpass='password' -pusherHost='localhost' -pusherSecret='somesecret' -pusherKey='somekey' -pusherSecure=false pusherApp="1" -db="vigilate"
