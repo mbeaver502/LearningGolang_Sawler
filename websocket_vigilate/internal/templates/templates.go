@@ -1,7 +1,7 @@
 package templates
 
 import (
-	"github.com/mbeaver502/vigilate/internal/models"
+	"github.com/tsawler/vigilate/internal/models"
 )
 
 // TemplateData defines template data

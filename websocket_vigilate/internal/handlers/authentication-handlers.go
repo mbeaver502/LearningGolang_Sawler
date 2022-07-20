@@ -4,13 +4,12 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"github.com/tsawler/vigilate/internal/helpers"
+	"github.com/tsawler/vigilate/internal/models"
 	"log"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/mbeaver502/vigilate/internal/helpers"
-	"github.com/mbeaver502/vigilate/internal/models"
 )
 
 // LoginScreen shows the home (login) screen
