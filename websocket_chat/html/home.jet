@@ -66,6 +66,8 @@
     integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
     crossorigin="anonymous"></script>
 
+<script src="/static/reconnecting-websocket.min.js"></script>
+
 <script>
     let socket = null;
     let chatbox = document.getElementById("output")
@@ -83,7 +85,7 @@
     // When the DOM is loaded on this page, try to establish a WebSocket connection
     // to our server, which is listening on localhost:8080.
     document.addEventListener("DOMContentLoaded", function () {
-        socket = new WebSocket("ws://127.0.0.1:8080/ws");
+        socket = new ReconnectingWebSocket("ws://127.0.0.1:8080/ws", null, {debug: true, reconnectInterval: 3000});
 
         socket.onopen = () => {
             console.log("successfully connected");
