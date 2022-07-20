@@ -3,3 +3,4 @@ bookings/bookings
 bookings/bookings.exe
 bookings/database.yml
 bookings/static/admin/*
+websocket_vigilate/database.yml
