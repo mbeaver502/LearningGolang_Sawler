@@ -2,18 +2,19 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/CloudyKit/jet/v6"
-	"github.com/go-chi/chi"
-	"github.com/tsawler/vigilate/internal/config"
-	"github.com/tsawler/vigilate/internal/driver"
-	"github.com/tsawler/vigilate/internal/helpers"
-	"github.com/tsawler/vigilate/internal/models"
-	"github.com/tsawler/vigilate/internal/repository"
-	"github.com/tsawler/vigilate/internal/repository/dbrepo"
 	"log"
 	"net/http"
 	"runtime/debug"
 	"strconv"
+
+	"github.com/CloudyKit/jet/v6"
+	"github.com/go-chi/chi"
+	"github.com/mbeaver502/vigilate/internal/config"
+	"github.com/mbeaver502/vigilate/internal/driver"
+	"github.com/mbeaver502/vigilate/internal/helpers"
+	"github.com/mbeaver502/vigilate/internal/models"
+	"github.com/mbeaver502/vigilate/internal/repository"
+	"github.com/mbeaver502/vigilate/internal/repository/dbrepo"
 )
 
 //Repo is the repository

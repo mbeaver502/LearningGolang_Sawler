@@ -2,8 +2,9 @@ package dbrepo
 
 import (
 	"database/sql"
-	"github.com/tsawler/vigilate/internal/config"
-	"github.com/tsawler/vigilate/internal/repository"
+
+	"github.com/mbeaver502/vigilate/internal/config"
+	"github.com/mbeaver502/vigilate/internal/repository"
 )
 
 var app *config.AppConfig
