@@ -120,7 +120,17 @@ func (repo *DBRepo) PostSettings(w http.ResponseWriter, r *http.Request) {
 
 // AllHosts displays list of all hosts
 func (repo *DBRepo) AllHosts(w http.ResponseWriter, r *http.Request) {
-	err := helpers.RenderPage(w, r, "hosts", nil, nil)
+	hosts, err := repo.DB.GetAllHosts()
+	if err != nil {
+		log.Println(err)
+		helpers.ServerError(w, r, err)
+		return
+	}
+
+	vars := make(jet.VarMap)
+	vars.Set("hosts", hosts)
+
+	err = helpers.RenderPage(w, r, "hosts", vars, nil)
 	if err != nil {
 		printTemplateError(w, err)
 	}
@@ -128,7 +138,27 @@ func (repo *DBRepo) AllHosts(w http.ResponseWriter, r *http.Request) {
 
 // Host shows the host add/edit form
 func (repo *DBRepo) Host(w http.ResponseWriter, r *http.Request) {
-	err := helpers.RenderPage(w, r, "host", nil, nil)
+	// get the id from the URL: /admin/host/{id}
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	var h models.Host
+
+	// host already exists, so get it from the database
+	if id > 0 {
+		host, err := repo.DB.GetHostByID(id)
+		if err != nil {
+			log.Println(err)
+			helpers.ServerError(w, r, err)
+			return
+		}
+
+		h = host
+	}
+
+	vars := make(jet.VarMap)
+	vars.Set("host", h)
+
+	err := helpers.RenderPage(w, r, "host", vars, nil)
 	if err != nil {
 		printTemplateError(w, err)
 	}
@@ -136,11 +166,53 @@ func (repo *DBRepo) Host(w http.ResponseWriter, r *http.Request) {
 
 // PostHost handles POSTed form data.
 func (repo *DBRepo) PostHost(w http.ResponseWriter, r *http.Request) {
-	// err := helpers.RenderPage(w, r, "host", nil, nil)
-	// if err != nil {
-	// 	printTemplateError(w, err)
-	// }
-	w.Write([]byte("posted form!"))
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	var h models.Host
+
+	// host already exists, so get it from the database
+	if id > 0 {
+		host, err := repo.DB.GetHostByID(id)
+		if err != nil {
+			log.Println(err)
+			helpers.ServerError(w, r, err)
+			return
+		}
+
+		h = host
+
+	}
+
+	h.HostName = r.Form.Get("host_name")
+	h.CanonicalName = r.Form.Get("canonical_name")
+	h.URL = r.Form.Get("url")
+	h.IP = r.Form.Get("ip")
+	h.IPv6 = r.Form.Get("ipv6")
+	h.Location = r.Form.Get("location")
+	h.OS = r.Form.Get("os")
+	h.Active, _ = strconv.Atoi(r.Form.Get("active"))
+
+	if id > 0 {
+		err := repo.DB.UpdateHost(h)
+		if err != nil {
+			log.Println(err)
+			helpers.ServerError(w, r, err)
+			return
+		}
+	} else {
+
+		newID, err := repo.DB.InsertHost(h)
+		if err != nil {
+			log.Println(err)
+			helpers.ServerError(w, r, err)
+			return
+		}
+
+		h.ID = newID
+	}
+
+	repo.App.Session.Put(r.Context(), "flash", "Changes saved")
+	http.Redirect(w, r, fmt.Sprintf("/admin/host/%d", h.ID), http.StatusSeeOther)
 }
 
 // AllUsers lists all admin users
