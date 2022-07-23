@@ -35,16 +35,20 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-                {{range services}}
+                {{if len(services) > 0}}
+                    {{range services}}
+                        <tr>
+                            <td><a href="/admin/host/{{.HostID}}#healthy-content">{{.HostName}}</a></td>
+                            <td><span class="badge bg-info">{{.Service.ServiceName}}</span></td>
+                            <td><span class="badge bg-success">{{.Status}}</span></td>
+                            <td></td>
+                        </tr>
+                    {{end}}
+                {{else}}
                     <tr>
-                        <td><a href="/admin/host/{{.HostID}}#healthy-content">{{.HostName}}</a></td>
-                        <td><span class="badge bg-info">{{.Service.ServiceName}}</span></td>
-                        <td><span class="badge bg-success">{{.Status}}</span></td>
-                        <td></td>
+                        <td colspan="4">No Services</td>
                     </tr>
                 {{end}}
-            </tr>
             </tbody>
         </table>
     </div>
