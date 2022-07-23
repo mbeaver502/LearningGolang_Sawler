@@ -7,7 +7,7 @@ require (
 	github.com/alexedwards/scs/postgresstore v0.0.0-20210131110750-3ca38f9a41cc
 	github.com/alexedwards/scs/v2 v2.4.0
 	github.com/aymerick/douceur v0.2.0
-	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-chi/chi/v5 v5.0.7
 	github.com/jackc/pgconn v1.12.1
 	github.com/jackc/pgx/v4 v4.16.1
 	github.com/justinas/nosurf v1.1.1
