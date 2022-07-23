@@ -29,21 +29,49 @@
             showCloseButton: true,
         });
 
-        // remove existing table row if it exists
-        let exists = !!document.getElementById("host-service-" + data.host_service_id);
-        if (exists) {
-            let row = document.getElementById("host-service-" + data.host_service_id);
-            row.parentNode.removeChild(row);
-        }
+        deleteHostServiceRow(data.host_service_id);
+        updateHostServiceTable(data);
+    });
 
+    function deleteHostServiceRow(hostServiceID) {
+        // remove existing table row if it exists
+        let exists = !!document.getElementById("host-service-" + hostServiceID);
+        if (exists) {
+            let row = document.getElementById("host-service-" + hostServiceID);
+            row.parentNode.removeChild(row);
+
+            // if that was the last row, add a "No Services" row
+            let tables = ["healthy", "pending", "problem", "warning"];
+            for (let i = 0; i < tables.length; i++) {
+                let currentTableExists = !!document.getElementById(tables[i] + "-table");
+                if (currentTableExists) {
+                    let currentTable = document.getElementById(tables[i] + "-table");
+                    if (currentTable.rows.length === 1) {
+                        let newRow = currentTable.tBodies[0].InsertRow(-1);
+                        let newCell = newRow.insertCell(0);
+                        newCell.setAttribute("colspan", "3");
+                        newCell.innerHTML = "No services";
+                    }
+                }
+            }
+        }
+    }
+
+    function updateHostServiceTable(data) {
         // update tables if they exist
         exists = !!document.getElementById(data.status + "-table");
         if (exists) {
-            console.log("trying to add row to " + data.status + "-table");
-            
             let tableRef = document.getElementById(data.status + "-table");
+            
+            let tableContent = tableRef.innerHTML;
+            if (tableContent.includes("No services")) {
+                let rowCount = tableRef.rows.length;
+                for (let i = rowCount - 1; i > 0; i--) {
+                    tableRef.deleteRow(i);
+                }
+            }
+            
             let newRow = tableRef.tBodies[0].insertRow(-1);
-
             newRow.setAttribute("id", "host-service-" + data.host_service_id);
 
             // insert first td
@@ -62,7 +90,7 @@
             // insert third td
             newCell = newRow.insertCell(2);
         }
-    });
+    }
 
     publicChannel.bind("host-service-count-changed", function(data) {
         let healthyCountExists = !!document.getElementById("healthy_count")
