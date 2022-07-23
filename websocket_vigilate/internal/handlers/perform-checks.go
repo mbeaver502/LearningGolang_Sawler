@@ -155,11 +155,21 @@ func (repo *DBRepo) testServiceForHost(h models.Host, hs models.HostService) (st
 	// if the host service status has changed, broadcast to all clients
 	if newStatus != hs.Status {
 		data := make(map[string]string)
-		data["message"] = fmt.Sprintf("host service %s on %s has changed to %s", hs.Service.ServiceName, hs.HostName, newStatus)
+
+		data["host_id"] = strconv.Itoa(hs.HostID)
+		data["host_service_id"] = strconv.Itoa(hs.ID)
+		data["host_name"] = h.HostName
+		data["service_name"] = hs.Service.ServiceName
+		data["icon"] = hs.Service.Icon
+		data["status"] = newStatus
+		data["message"] = fmt.Sprintf("%s on %s reports %s", hs.Service.ServiceName, h.HostName, newStatus)
+		data["last_check"] = time.Now().Format("2006-01-02 15:04:06")
+
 		repo.broadcastMessage("public-channel", "host-service-status-changed", data)
 
-		// if appropriate, send email or SMS message
 	}
+
+	// TODO - if appropriate, send email or SMS message
 
 	return newStatus, msg
 }
