@@ -110,6 +110,7 @@ Host
                     </div>
                 </div>
                 
+                <!-- Only show these tabs if we're displaying a Host that already exists. -->
                 {{if host.ID > 0}}
                     <div class="tab-pane fade" role="tabpanel" aria-labelledby="services-tab"
                     id="services-content">
@@ -124,13 +125,26 @@ Host
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>HTTP</td>
-                                            <td><div class="form-check form-switch">
-                                                <input type="checkbox" class="form-check-input" id="http_service" name="http" value="1">
-                                                <label class="form-check-label" for="active">Active</label>
-                                            </div></td>
-                                        </tr>
+                                        {{range host.HostServices}}
+                                            <tr>
+                                                <td>{{.Service.ServiceName}}</td>
+                                                <td>
+                                                    <div class="form-check form-switch">
+                                                        <input type="checkbox" class="form-check-input" 
+                                                        name="{{.Service.ServiceName}}" 
+                                                        value="1"
+                                                        data-type="toggle-service"
+                                                        data-service="{{.ServiceID}}"
+                                                        data-host-id="{{.HostID}}"
+                                                        {{if .Active == 1}}
+                                                            checked
+                                                        {{end}}
+                                                        >
+                                                        <label class="form-check-label" for="http_service">Active</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {{end}}
                                     </tbody>
                                 </table>
                             </div>
@@ -184,6 +198,40 @@ Host
 
 {{ block js() }}
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let toggles = document.querySelectorAll("[data-service]");
+
+        for (let i = 0; i < toggles.length; i++) {
+            toggles[i].addEventListener("change", function() {
+                let active = "1";
+
+                if (!this.checked) {
+                    active = "0";
+                } 
+
+                let formData = new FormData();
+
+                formData.append("host_id", this.getAttribute("data-host-id"));
+                formData.append("service_id", this.getAttribute("data-service"));
+                formData.append("active", active);
+                formData.append("csrf_token", "{{.CSRFToken}}");
+
+                fetch("/admin/host/ajax/toggle-service", {
+                    method: "POST",
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        successAlert("Changes saved!");
+                    } else {
+                        errorAlert("Something went wrong.");
+                    }
+                });
+            });
+        }
+    });
+
     function val() {
             document.getElementById("action").value = 0;
             let form = document.getElementById("host-form");
