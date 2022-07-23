@@ -331,3 +331,75 @@ func (m *postgresDBRepo) GetAllServiceStatusCounts() (int, int, int, int, error)
 
 	return pending, healthy, warning, problem, nil
 }
+
+func (m *postgresDBRepo) GetServicesByStatus(status string) ([]models.HostService, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `
+	select
+		hs.id,
+		hs.host_id,
+		hs.service_id,
+		hs.active,
+		hs.schedule_number,
+		hs.schedule_unit,
+		hs.last_check,
+		hs.status,
+		hs.created_at,
+		hs.updated_at,
+		h.host_name,
+		s.service_name
+	from
+		host_services hs
+	left join hosts h on
+		(hs.host_id = h.id)
+	left join services s on
+		(hs.service_id = s.id)
+	where
+			status = $1
+		and hs.active = 1`
+
+	rows, err := m.DB.QueryContext(ctx, query,
+		status,
+	)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var services []models.HostService
+
+	for rows.Next() {
+		var hs models.HostService
+
+		err = rows.Scan(
+			&hs.ID,
+			&hs.HostID,
+			&hs.ServiceID,
+			&hs.Active,
+			&hs.ScheduleNumber,
+			&hs.ScheduleUnit,
+			&hs.LastCheck,
+			&hs.Status,
+			&hs.CreatedAt,
+			&hs.UpdatedAt,
+			&hs.HostName,
+			&hs.Service.ServiceName,
+		)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		services = append(services, hs)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return services, nil
+}

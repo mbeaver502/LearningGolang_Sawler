@@ -36,7 +36,14 @@
             </thead>
             <tbody>
             <tr>
-                <td colspan="5">No services</td>
+                {{range services}}
+                    <tr>
+                        <td><a href="/admin/host/{{.HostID}}#healthy-content">{{.HostName}}</a></td>
+                        <td><span class="badge bg-info">{{.Service.ServiceName}}</span></td>
+                        <td><span class="badge bg-success">{{.Status}}</span></td>
+                        <td></td>
+                    </tr>
+                {{end}}
             </tr>
             </tbody>
         </table>
