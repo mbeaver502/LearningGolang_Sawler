@@ -32,7 +32,58 @@ type jsonResponse struct {
 
 // ScheduleCheck performs a scheduled check on a host service by id.
 func (repo *DBRepo) ScheduledCheck(hostServiceID int) {
+	hs, err := repo.DB.GetHostServiceByID(hostServiceID)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
+	host, err := repo.DB.GetHostByID(hs.HostID)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	newStatus, msg := repo.testServiceForHost(host, hs)
+
+	if newStatus != hs.Status {
+		repo.updateHostServiceStatusCount(host, hs, newStatus, msg)
+	}
+}
+
+func (repo *DBRepo) updateHostServiceStatusCount(h models.Host, hs models.HostService, newStatus string, msg string) {
+	// update host service record in database with status and last check
+	hs.Status = newStatus
+	hs.LastCheck = time.Now()
+
+	err := repo.DB.UpdateHostService(hs)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	pending, healthy, warning, problem, err := repo.DB.GetAllServiceStatusCounts()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	data := make(map[string]string)
+	data["healthy_count"] = strconv.Itoa(healthy)
+	data["pending_count"] = strconv.Itoa(pending)
+	data["problem_count"] = strconv.Itoa(problem)
+	data["warning_count"] = strconv.Itoa(warning)
+
+	repo.broadcastMessage("public-channel", "host-service-count-changed", data)
+
+	log.Println("New status is", newStatus, "and message is", msg)
+}
+
+func (repo *DBRepo) broadcastMessage(channel, event string, data map[string]string) {
+	err := app.WsClient.Trigger(channel, event, data)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // TestCheck checks the status of a host service.
@@ -99,6 +150,15 @@ func (repo *DBRepo) testServiceForHost(h models.Host, hs models.HostService) (st
 	switch hs.ServiceID {
 	case HTTP:
 		msg, newStatus = testHTTPForHost(h.URL)
+	}
+
+	// if the host service status has changed, broadcast to all clients
+	if newStatus != hs.Status {
+		data := make(map[string]string)
+		data["message"] = fmt.Sprintf("host service %s on %s has changed to %s", hs.Service.ServiceName, hs.HostName, newStatus)
+		repo.broadcastMessage("public-channel", "host-service-status-changed", data)
+
+		// if appropriate, send email or SMS message
 	}
 
 	return newStatus, msg

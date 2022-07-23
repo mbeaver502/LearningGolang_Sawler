@@ -13,9 +13,36 @@
 
     let publicChannel = pusher.subscribe("public-channel");
 
-    publicChannel.bind("test-event", function(data) {
-        successAlert(data.message)
+    publicChannel.bind("app-starting", function(data) {
+        successAlert(data.message);
     });
+
+    publicChannel.bind("app-stopping", function(data) {
+        warningAlert(data.message);
+    });
+
+    publicChannel.bind("host-service-status-changed", function(data) {
+        successAlert(data.message);
+    });
+
+    publicChannel.bind("host-service-count-changed", function(data) {
+        let healthyCountExists = !!document.getElementById("healthy_count")
+
+        if (healthyCountExists) {
+            document.getElementById("healthy_count").innerHTML = data.healthy_count;
+            document.getElementById("warning_count").innerHTML = data.warning_count;
+            document.getElementById("problem_count").innerHTML = data.problem_count;
+            document.getElementById("pending_count").innerHTML = data.pending_count;
+        }
+    });
+
+    // things we want to look for
+    //  - service goes down
+    //  - service comes up
+    //  - service status changed
+    //  - schedule changed
+    //  - monitoring is turned off
+    //  - next-run-event changes
 
     let attention = Prompt();
 
