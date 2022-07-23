@@ -402,3 +402,67 @@ func (repo *DBRepo) ToggleServiceForHost(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(out)
 }
+
+// SetSystemPref updates system preferences.
+func (repo *DBRepo) SetSystemPref(w http.ResponseWriter, r *http.Request) {
+	var resp jsonResponse
+	resp.Ok = true
+	resp.Message = ""
+
+	prefName := r.PostForm.Get("pref_name")
+	prefValue := r.PostForm.Get("pref_value")
+
+	err := repo.DB.UpdateSystemPref(prefName, prefValue)
+	if err != nil {
+		log.Println(err)
+		resp.Ok = false
+		resp.Message = err.Error()
+	}
+
+	repo.App.PreferenceMap["monitoring_live"] = prefValue
+
+	out, _ := json.Marshal(resp)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(out)
+}
+
+// ToggleMonitoring toggles monitoring of services.
+func (repo *DBRepo) ToggleMonitoring(w http.ResponseWriter, r *http.Request) {
+	enabled := r.PostForm.Get("enabled")
+
+	if enabled == "1" {
+		// start monitoring
+		log.Println("starting monitoring...")
+		repo.StartMonitoring()
+		repo.App.Scheduler.Start()
+	} else {
+		// stop monitoring
+		log.Println("stopping monitoring...")
+
+		// remove all items in map from schedule
+		for _, x := range repo.App.MonitorMap {
+			repo.App.Scheduler.Remove(x)
+		}
+
+		// empty the map
+		for k := range repo.App.MonitorMap {
+			delete(repo.App.MonitorMap, k)
+		}
+
+		// delete all entries from schedule, to be sure
+		for _, i := range repo.App.Scheduler.Entries() {
+			repo.App.Scheduler.Remove(i.ID)
+		}
+
+		repo.App.Scheduler.Stop()
+	}
+
+	var resp jsonResponse
+	resp.Ok = true
+
+	out, _ := json.Marshal(resp)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(out)
+}
