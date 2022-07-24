@@ -5,6 +5,8 @@ This is the source code for the second project in the Udemy course Working with 
 
 A dead simple monitoring service, intended to replace things like Nagios.
 
+**Note:** This code was cloned from the "starter" code on [tsawler's page](https://www.github.com/tsawler/) and built upon while working through the Udemy course.
+
 ## Build
 
 Build in the normal way on Mac/Linux:
