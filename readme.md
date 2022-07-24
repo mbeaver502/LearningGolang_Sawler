@@ -1,1 +1,1 @@
-Code created while working through the "Building Modern Web Applications with Go (Golang)" course by Trevor Sawler on udemy.
+Code created while working through Trevor Sawler's Go courses on udemy.
