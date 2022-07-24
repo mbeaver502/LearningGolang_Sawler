@@ -107,6 +107,23 @@ func (repo *DBRepo) TestCheck(w http.ResponseWriter, r *http.Request) {
 
 	newStatus, msg := repo.testServiceForHost(h, hs)
 
+	// log event to database
+	event := models.Event{
+		HostServiceID: hs.ID,
+		EventType:     newStatus,
+		HostID:        hs.HostID,
+		ServiceName:   hs.Service.ServiceName,
+		HostName:      hs.HostName,
+		Message:       msg,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
+	}
+
+	err = repo.DB.InsertEvent(event)
+	if err != nil {
+		log.Println(err)
+	}
+
 	// broadcast service status changed event
 	if newStatus != hs.Status {
 		repo.pushStatusChangedEvent(h, hs, newStatus)
