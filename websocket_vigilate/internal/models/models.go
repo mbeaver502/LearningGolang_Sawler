@@ -95,3 +95,16 @@ type Schedule struct {
 	HostServiceID int
 	ScheduleText  string
 }
+
+// Event is the model of events.
+type Event struct {
+	ID            int
+	HostServiceID int
+	EventType     string
+	HostID        int
+	ServiceName   string
+	HostName      string
+	Message       string
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+}

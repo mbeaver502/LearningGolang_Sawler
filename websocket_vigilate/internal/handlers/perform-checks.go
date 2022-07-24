@@ -158,6 +158,23 @@ func (repo *DBRepo) testServiceForHost(h models.Host, hs models.HostService) (st
 	// if the host service status has changed, broadcast to all clients
 	if newStatus != hs.Status {
 		repo.pushStatusChangedEvent(h, hs, newStatus)
+
+		// log event to database
+		event := models.Event{
+			HostServiceID: hs.ID,
+			EventType:     newStatus,
+			HostID:        hs.HostID,
+			ServiceName:   hs.Service.ServiceName,
+			HostName:      hs.HostName,
+			Message:       msg,
+			CreatedAt:     time.Now(),
+			UpdatedAt:     time.Now(),
+		}
+
+		err := repo.DB.InsertEvent(event)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
 	repo.pushScheduleChangedEvent(hs, newStatus)
