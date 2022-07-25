@@ -1,15 +1,16 @@
 import React, { Component, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 
-export default class Genres extends Component {
+export default class OneGenre extends Component {
     state = {
-        genres: [],
+        movies: [],
         isLoaded: false,
         error: null,
+        genreName: "",
     }
 
     componentDidMount() {
-        fetch("http://localhost:4000/v1/genres")
+        fetch("http://localhost:4000/v1/movies/" + this.props.match.params.id)
             .then((response) => {
                 if (response.status !== 200) {
                     let err = Error;
@@ -23,8 +24,9 @@ export default class Genres extends Component {
             })
             .then((json) => {
                 this.setState({
-                    genres: json.genres,
+                    movies: json.movies,
                     isLoaded: true,
+                    genreName: this.props.location.genre_name,
                 },
                     (error) => {
                         this.setState({
@@ -37,7 +39,11 @@ export default class Genres extends Component {
     }
 
     render() {
-        const { genres, isLoaded, error } = this.state;
+        let { movies, isLoaded, error, genreName } = this.state;
+
+        if (!movies) {
+            movies = [];
+        }
 
         if (error) {
             return (
@@ -52,20 +58,16 @@ export default class Genres extends Component {
         } else {
             return (
                 <Fragment>
-                    <h2>Genres</h2>
+                    <h2>{genreName}</h2>
 
                     <div className='list-group'>
-                        {genres.map((m) => (
+                        {movies.map((m) => (
                             <Link
                                 key={m.id}
-                                to={{
-                                    pathname: `/genre/${m.id}`,
-                                    genre_name: m.genre_name,
-                                }}
+                                to={`/movies/${m.id}`}
                                 className='list-group-item list-group-item-action'>
-                                {m.genre_name}
+                                {m.title}
                             </Link>
-
                         ))}
                     </div>
                 </Fragment>
