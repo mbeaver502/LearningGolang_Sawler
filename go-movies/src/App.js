@@ -1,5 +1,5 @@
-import React, { Fragment } from 'react';
-import { BrowserRouter as Router, Switch, Route, Link, useParams, useRouteMatch } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Switch, Route, Link, useRouteMatch } from 'react-router-dom';
 import Movies from './components/Movies';
 import Home from './components/Home';
 import Admin from './components/Admin';
