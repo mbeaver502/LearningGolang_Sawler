@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { HashRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Movies from './components/Movies';
 import Home from './components/Home';
 import Admin from './components/Admin';
