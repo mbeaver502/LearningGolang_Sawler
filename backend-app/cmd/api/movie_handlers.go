@@ -1,11 +1,10 @@
 package main
 
 import (
-	"backend/models"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -20,18 +19,11 @@ func (app *application) getOneMovie(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	movie := models.Movie{
-		ID:          id,
-		Title:       "Test Movie",
-		Description: "This is a description",
-		Year:        1992,
-		ReleaseDate: time.Date(1992, 01, 01, 0, 0, 0, 1, time.UTC),
-		Runtime:     150,
-		Rating:      4,
-		MPAARating:  "PG-13",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-		MovieGenre:  []models.MovieGenre{},
+	movie, err := app.models.DB.Get(id)
+	if err != nil {
+		app.logger.Println(fmt.Errorf("no movie found for id %d", id))
+		app.errorJSON(w, err)
+		return
 	}
 
 	err = app.writeJSON(w, http.StatusOK, movie, "movie")
@@ -43,5 +35,17 @@ func (app *application) getOneMovie(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getAllMovies(w http.ResponseWriter, r *http.Request) {
+	movies, err := app.models.DB.All()
+	if err != nil {
+		app.logger.Println("error while getting all movies", err)
+		app.errorJSON(w, err)
+		return
+	}
 
+	err = app.writeJSON(w, http.StatusOK, movies, "movies")
+	if err != nil {
+		app.logger.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
 }
