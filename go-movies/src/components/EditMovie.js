@@ -3,6 +3,7 @@ import './EditMovie.css';
 import Input from './form-components/Input';
 import TextArea from './form-components/TextArea';
 import Select from './form-components/Select';
+import Alert from './ui-components/Alert';
 
 export default class EditMovie extends Component {
     constructor(props) {
@@ -28,6 +29,10 @@ export default class EditMovie extends Component {
             isLoaded: false,
             error: null,
             errors: [],
+            alert: {
+                type: "d-none",
+                message: "",
+            },
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -60,7 +65,21 @@ export default class EditMovie extends Component {
         fetch("http://localhost:4000/v1/admin/editmovie", requestOptions)
             .then(response => response.json())
             .then(data => {
-                console.log(data);
+                if (data.error) {
+                    this.setState({
+                        alert: {
+                            type: "alert-danger",
+                            message: data.error.message,
+                        }
+                    });
+                } else {
+                    this.setState({
+                        alert: {
+                            type: "alert-success",
+                            message: "Changes saved",
+                        }
+                    });
+                }
             });
     }
 
@@ -128,7 +147,7 @@ export default class EditMovie extends Component {
     }
 
     render() {
-        let { movie, isLoaded, error } = this.state
+        let { movie, isLoaded, error, alert } = this.state
 
         if (error) {
             return (
@@ -144,6 +163,12 @@ export default class EditMovie extends Component {
             return (
                 <Fragment>
                     <h2>Add / Edit Movie</h2>
+                    
+                    <Alert
+                        alertType={alert.type}
+                        alertMessage={alert.message}
+                    />
+
                     <hr />
 
                     <form onSubmit={this.handleSubmit}>
@@ -205,10 +230,6 @@ export default class EditMovie extends Component {
 
                         <button type='submit' className='btn btn-primary'>Save</button>
                     </form>
-
-                    <div className='mt-3'>
-                        <pre>{JSON.stringify(this.state, null, 3)}</pre>
-                    </div>
                 </Fragment>
             );
         }
