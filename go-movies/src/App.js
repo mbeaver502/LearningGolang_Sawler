@@ -48,7 +48,10 @@ export default function App() {
                             <Route path="/movies/:id"
                                 component={OneMovie} />
                             <Route path="/movies">
-                                <Movies />
+                                <Movies
+                                    title="Choose a Movie"
+                                    path="/movies/"
+                                />
                             </Route>
                             <Route path="/genre/:id"
                                 component={OneGenre} />

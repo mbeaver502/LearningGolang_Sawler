@@ -52,13 +52,16 @@ export default class Movies extends Component {
         } else {
             return (
                 <Fragment>
-                    <h2>Choose a Movie</h2>
+                    <h2>{this.props.title}</h2>
+
+                    <hr />
 
                     <div className='list-group'>
                         {movies.map((m) => (
                             <Link
                                 key={m.id}
-                                to={`/movies/${m.id}`}
+                                //to={`/movies/${m.id}`}
+                                to={`${this.props.path}${m.id}`}
                                 className='list-group-item list-group-item-action'>
                                 {m.title}
                             </Link>

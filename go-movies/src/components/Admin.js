@@ -1,10 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+import Movies from './Movies';
 
 export default class Admin extends Component {
 
     render() {
         return (
-            <h2>Manage Catalog</h2>
+            <Fragment>
+                <Movies
+                    title="Manage Catalog"
+                    path="/admin/movie/"
+                />
+            </Fragment>
         );
     }
 }

@@ -76,11 +76,8 @@ export default class EditMovie extends Component {
                         }
                     });
                 } else {
-                    this.setState({
-                        alert: {
-                            type: "alert-success",
-                            message: "Changes saved",
-                        }
+                    this.props.history.push({
+                        pathname: "/admin",
                     });
                 }
             });
