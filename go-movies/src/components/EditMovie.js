@@ -4,6 +4,7 @@ import Input from './form-components/Input';
 import TextArea from './form-components/TextArea';
 import Select from './form-components/Select';
 import Alert from './ui-components/Alert';
+import { Link } from 'react-router-dom';
 
 export default class EditMovie extends Component {
     constructor(props) {
@@ -163,7 +164,7 @@ export default class EditMovie extends Component {
             return (
                 <Fragment>
                     <h2>Add / Edit Movie</h2>
-                    
+
                     <Alert
                         alertType={alert.type}
                         alertMessage={alert.message}
@@ -228,7 +229,8 @@ export default class EditMovie extends Component {
 
                         <hr />
 
-                        <button type='submit' className='btn btn-primary'>Save</button>
+                        <button className='btn btn-primary'>Save</button>
+                        <Link to="/admin" className="btn btn-warning ms-1">Cancel</Link>
                     </form>
                 </Fragment>
             );
