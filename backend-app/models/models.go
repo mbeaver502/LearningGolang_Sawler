@@ -51,3 +51,10 @@ func NewModels(db *sql.DB) Models {
 		},
 	}
 }
+
+// User represents a user.
+type User struct {
+	ID       int
+	Email    string
+	Password string
+}
