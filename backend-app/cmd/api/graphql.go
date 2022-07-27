@@ -2,6 +2,9 @@ package main
 
 import (
 	"backend/models"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -89,4 +92,38 @@ func (app *application) moviesGraphQL(w http.ResponseWriter, r *http.Request) {
 	query := string(q)
 
 	app.logger.Println(query)
+
+	rootQuery := graphql.ObjectConfig{
+		Name:   "RootQuery",
+		Fields: fields,
+	}
+
+	schemaConfig := graphql.SchemaConfig{
+		Query: graphql.NewObject(rootQuery),
+	}
+
+	schema, err := graphql.NewSchema(schemaConfig)
+	if err != nil {
+		app.errorJSON(w, errors.New("failed to create GraphQL schema"))
+		app.logger.Println("failed to created GraphQL schema")
+		return
+	}
+
+	params := graphql.Params{
+		Schema:        schema,
+		RequestString: query,
+	}
+
+	resp := graphql.Do(params)
+	if len(resp.Errors) > 0 {
+		app.errorJSON(w, fmt.Errorf("failed: %+v", resp.Errors))
+		app.logger.Println(fmt.Errorf("failed: %+v", resp.Errors))
+		return
+	}
+
+	j, _ := json.Marshal(resp.Data)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(j)
 }
