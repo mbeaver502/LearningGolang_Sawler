@@ -8,6 +8,7 @@ import Genres from './components/Genres';
 import OneGenre from './components/OneGenre';
 import EditMovie from './components/EditMovie';
 import Login from './components/Login';
+import GraphQL from './components/GraphQL';
 
 export default class App extends Component {
     constructor(props) {
@@ -86,6 +87,10 @@ export default class App extends Component {
                                             </li>
                                         </Fragment>
                                     }
+
+                                    <li className='list-group-item'>
+                                        <Link to='/graphql'>GraphQL</Link>
+                                    </li>
                                 </ul>
                             </nav>
                         </div>
@@ -123,6 +128,10 @@ export default class App extends Component {
                                 <Route path="/admin" component={(props) => (
                                     <Admin {...props} jwt={this.state.jwt} />
                                 )} />
+
+                                <Route exact path='/graphql'>
+                                    <GraphQL />
+                                </Route>
 
                                 <Route path="/">
                                     <Home />
