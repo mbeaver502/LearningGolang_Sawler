@@ -126,10 +126,6 @@ func (app *application) deleteMovie(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *application) searchMovies(w http.ResponseWriter, r *http.Request) {
-
-}
-
 type MoviePayload struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
