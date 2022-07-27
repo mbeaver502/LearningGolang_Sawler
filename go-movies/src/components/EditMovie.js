@@ -59,10 +59,15 @@ export default class EditMovie extends Component {
 
         const data = new FormData(evt.target);
         const payload = Object.fromEntries(data.entries());
+        const headers = new Headers();
+
+        headers.append("Content-Type", "application/json");
+        headers.append("Authorization", "Bearer " + this.props.jwt);
 
         const requestOptions = {
             method: 'POST',
             body: JSON.stringify(payload),
+            headers: headers,
         }
 
         fetch("http://localhost:4000/v1/admin/editmovie", requestOptions)
@@ -100,6 +105,14 @@ export default class EditMovie extends Component {
     }
 
     componentDidMount() {
+        if (this.props.jwt === "") {
+            this.props.history.push({
+                pathname: "/login",
+            });
+
+            return;
+        }
+
         const id = this.props.match.params.id;
 
         // if id > 0, that means the movie already exists
@@ -147,6 +160,14 @@ export default class EditMovie extends Component {
     }
 
     confirmDelete = (e) => {
+        if (this.props.jwt === "") {
+            this.props.history.push({
+                pathname: "/login",
+            });
+
+            return;
+        }
+
         confirmAlert({
             title: 'Delete movie?',
             message: 'Are you sure?',
@@ -154,7 +175,16 @@ export default class EditMovie extends Component {
                 {
                     label: 'Yes',
                     onClick: () => {
-                        fetch("http://localhost:4000/v1/admin/deletemovie/" + this.state.movie.id, { method: "GET" })
+                        const headers = new Headers();
+                        headers.append("Content-Type", "application/json");
+                        headers.append("Authorization", "Bearer " + this.props.jwt);
+
+                        const requestOptions = {
+                            method: 'GET',
+                            headers: headers,
+                        }
+
+                        fetch("http://localhost:4000/v1/admin/deletemovie/" + this.state.movie.id, requestOptions)
                             .then(response => response.json())
                             .then(data => {
                                 if (data.error) {
