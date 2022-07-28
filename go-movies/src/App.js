@@ -3,13 +3,13 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Home from './components/Home';
 import Admin from './components/Admin';
 import OneMovie from './components/OneMovie';
-import Genres from './components/Genres';
 import OneGenre from './components/OneGenre';
 import EditMovie from './components/EditMovie';
 import Login from './components/Login';
 import GraphQL from './components/GraphQL';
 import OneMovieGraphQL from './components/OneMovieGraphQL';
 import MoviesFunc from './components/MoviesFunc';
+import GenresFunc from './components/GenresFunc';
 
 export default class App extends Component {
     constructor(props) {
@@ -118,7 +118,7 @@ export default class App extends Component {
                                     component={OneGenre} />
 
                                 <Route exact path="/genres">
-                                    <Genres />
+                                    <GenresFunc />
                                 </Route>
 
                                 <Route path="/admin/movie/:id"
