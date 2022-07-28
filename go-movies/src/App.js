@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Home from './components/Home';
-import Admin from './components/Admin';
+import AdminFunc from './components/AdminFunc';
 import EditMovie from './components/EditMovie';
 import Login from './components/Login';
 import GraphQL from './components/GraphQL';
@@ -127,7 +127,7 @@ export default class App extends Component {
                                     )} />
 
                                 <Route path="/admin" component={(props) => (
-                                    <Admin {...props} jwt={this.state.jwt} />
+                                    <AdminFunc {...props} jwt={this.state.jwt} />
                                 )} />
 
                                 <Route exact path='/graphql'>
