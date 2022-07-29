@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"net/http"
+	"time"
 )
 
 type jsonResponse struct {
@@ -12,6 +14,7 @@ type jsonResponse struct {
 
 type envelope map[string]interface{}
 
+// Login handles logging in a user.
 func (app *application) Login(w http.ResponseWriter, r *http.Request) {
 	type credentials struct {
 		Username string `json:"email"`
@@ -19,7 +22,6 @@ func (app *application) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var creds credentials
-	var payload jsonResponse
 
 	err := app.readJSON(w, r, &creds)
 	if err != nil {
@@ -28,10 +30,48 @@ func (app *application) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO -- authenticate
+	// authenticate the user
+	// look up the user by email (provided by the JSON payload)
+	user, err := app.models.User.GetByEmail(creds.Username)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, errors.New("invalid username or password"))
+		return
+	}
 
-	payload.Error = false
-	payload.Message = "successfully logged in"
+	// validate the user's provided password
+	validPassword, err := user.PasswordMatches(creds.Password)
+	if !validPassword || err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, errors.New("invalid username or password"))
+		return
+	}
+
+	// if user is valid, generate a token
+	token, err := app.models.Token.GenerateToken(user.ID, 24*time.Hour)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	// save token to database
+	err = app.models.Token.Insert(*token, *user)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	// send back response
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "logged in",
+		Data: envelope{
+			"token": token,
+		},
+	}
 
 	err = app.writeJSON(w, http.StatusOK, payload)
 	if err != nil {
