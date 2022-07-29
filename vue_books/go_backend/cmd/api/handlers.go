@@ -4,7 +4,10 @@ import (
 	"books_backend/internal/data"
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type jsonResponse struct {
@@ -129,4 +132,114 @@ func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.writeJSON(w, http.StatusOK, payload)
+}
+
+// EditUser edits and saves a user.
+func (app *application) EditUser(w http.ResponseWriter, r *http.Request) {
+	var user data.User
+
+	err := app.readJSON(w, r, &user)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	// if ID is 0, then we're adding a new user
+	if user.ID == 0 {
+		if _, err := user.Insert(); err != nil {
+			app.errorLog.Println(err)
+			app.errorJSON(w, err)
+			return
+		}
+	} else {
+		u, err := app.models.User.GetByID(user.ID)
+		if err != nil {
+			app.errorLog.Println(err)
+			app.errorJSON(w, err)
+			return
+		}
+
+		u.Email = user.Email
+		u.FirstName = user.FirstName
+		u.LastName = user.LastName
+
+		// update does not change password
+		if err = u.Update(); err != nil {
+			app.errorLog.Println(err)
+			app.errorJSON(w, err)
+			return
+		}
+
+		// if password != empty string, update password
+		if user.Password != "" {
+			err := u.ResetPassword(user.Password)
+			if err != nil {
+				app.errorLog.Println(err)
+				app.errorJSON(w, err)
+				return
+			}
+		}
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "Changes saved",
+	}
+
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+// GetUser writes back a requested user.
+func (app *application) GetUser(w http.ResponseWriter, r *http.Request) {
+	userID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	user, err := app.models.User.GetByID(userID)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	app.writeJSON(w, http.StatusOK, user)
+}
+
+// DeleteUser deletes a given user.
+func (app *application) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	var requestPayload struct {
+		ID string `json:"id"`
+	}
+
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	id, err := strconv.Atoi(requestPayload.ID)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	err = app.models.User.DeleteByID(id)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "Changes saved",
+	}
+
+	app.writeJSON(w, http.StatusAccepted, payload)
 }

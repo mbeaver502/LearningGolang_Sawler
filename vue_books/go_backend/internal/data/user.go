@@ -140,12 +140,17 @@ func (u *User) Update() error {
 
 // Delete deletes the user.
 func (u *User) Delete() error {
+	return u.DeleteByID(u.ID)
+}
+
+// DeleteByID deletes the user with the given ID.
+func (u *User) DeleteByID(id int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
 	stmt := `delete from users where id = $1`
 
-	_, err := db.ExecContext(ctx, stmt, u.ID)
+	_, err := db.ExecContext(ctx, stmt, id)
 	if err != nil {
 		return err
 	}
