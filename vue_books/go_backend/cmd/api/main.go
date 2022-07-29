@@ -1,11 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 type config struct {
@@ -39,27 +39,17 @@ func main() {
 }
 
 func (app *application) serve() error {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		var payload struct {
-			Ok      bool   `json:"ok"`
-			Message string `json:"message"`
-		}
-
-		payload.Ok = true
-		payload.Message = "hello world!"
-
-		out, err := json.Marshal(payload)
-		if err != nil {
-			app.errorLog.Println(err)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(out)
-	})
-
 	app.infoLog.Println("API listening on port", app.config.port)
 
-	return http.ListenAndServe(fmt.Sprintf(":%d", app.config.port), nil)
+	srv := &http.Server{
+		Addr:              fmt.Sprintf(":%d", app.config.port),
+		Handler:           app.routes(),
+		ReadTimeout:       10 * time.Second,
+		ReadHeaderTimeout: 10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       10 * time.Second,
+		ErrorLog:          app.errorLog,
+	}
+
+	return srv.ListenAndServe()
 }
