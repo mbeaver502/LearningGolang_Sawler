@@ -83,7 +83,7 @@
 import { store } from "./store.js";
 import router from "./../router/index.js";
 import notie from "notie";
-
+import Security from "./security.js";
 export default {
   data() {
     return {
@@ -92,18 +92,14 @@ export default {
   },
   methods: {
     logout() {
-      console.log("logging out");
-
       const payload = {
         token: store.token,
       };
 
-      const requestOptions = {
-        body: JSON.stringify(payload),
-        method: "POST",
-      };
-
-      fetch(process.env.VUE_APP_API_URL + "/users/logout", requestOptions)
+      fetch(
+        process.env.VUE_APP_API_URL + "/users/logout",
+        Security.requestOptions(payload)
+      )
         .then((response) => response.json())
         .then((response) => {
           if (response.error) {
