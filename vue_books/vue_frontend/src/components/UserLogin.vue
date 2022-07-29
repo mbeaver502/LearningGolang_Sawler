@@ -6,8 +6,7 @@
         <hr />
         <form-tag @myevent="submitHandler" name="myform" event="myevent">
           <text-input
-            :value="email"
-            @update:value="(newValue) => (email = newValue)"
+            v-model="email"
             label="Email"
             type="email"
             name="email"
@@ -16,8 +15,7 @@
           </text-input>
 
           <text-input
-            :value="password"
-            @update:value="(newValue) => (password = newValue)"
+            v-model="password"
             label="Password"
             type="password"
             name="password"
