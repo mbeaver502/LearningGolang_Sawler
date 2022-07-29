@@ -1,6 +1,7 @@
 package main
 
 import (
+	"books_backend/internal/driver"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,6 +15,7 @@ type config struct {
 
 type application struct {
 	config   config
+	db       *driver.DB
 	infoLog  *log.Logger
 	errorLog *log.Logger
 }
@@ -25,16 +27,22 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
+	dsn := "host=localhost port=5432 user=postgres password=password dbname=vueapi sslmode=disable timezone=UTC connect_timeout=5"
+	db, err := driver.ConnectPostgres(dsn)
+	if err != nil {
+		log.Fatalln("cannot connect to database", err)
+	}
+
 	app := &application{
 		config:   cfg,
+		db:       db,
 		infoLog:  infoLog,
 		errorLog: errorLog,
 	}
 
-	err := app.serve()
+	err = app.serve()
 	if err != nil {
-		app.errorLog.Println(err)
-		return
+		app.errorLog.Fatalln(err)
 	}
 }
 
