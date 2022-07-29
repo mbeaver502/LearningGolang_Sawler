@@ -5,7 +5,7 @@ let Security = {
     // make sure user is authenticated
     requireToken: function () {
         if (store.token === "") {
-            router.push('/');
+            router.push('/login');
             return false;
         }
     },
