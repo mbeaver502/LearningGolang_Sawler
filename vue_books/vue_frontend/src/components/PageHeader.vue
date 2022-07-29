@@ -24,8 +24,12 @@
             <router-link v-if="store.token == ''" class="nav-link" to="/login"
               >Login</router-link
             >
-            <router-link v-else class="nav-link" to="/logout"
-              >Logout</router-link
+            <a
+              v-else
+              class="nav-link"
+              href="javascript:void(0);"
+              @click="logout"
+              >Logout</a
             >
           </li>
         </ul>
@@ -36,12 +40,49 @@
 
 <script>
 import { store } from "./store.js";
+import router from "./../router/index.js";
+import notie from "notie";
 
 export default {
   data() {
     return {
       store,
     };
+  },
+  methods: {
+    logout() {
+      console.log("logging out");
+
+      const payload = {
+        token: store.token,
+      };
+
+      const requestOptions = {
+        body: JSON.stringify(payload),
+        method: "POST",
+      };
+
+      fetch("http://localhost:8081/users/logout", requestOptions)
+        .then((response) => response.json())
+        .then((response) => {
+          if (response.error) {
+            notie.alert({
+              type: "error",
+              text: response.message,
+              stay: true,
+            });
+          } else {
+            notie.alert({
+              type: "info",
+              text: response.message,
+              stay: true,
+            });
+
+            store.token = "";
+            router.push("/login");
+          }
+        });
+    },
   },
 };
 </script>
