@@ -80,3 +80,31 @@ func (app *application) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+// Logout logs out a user.
+func (app *application) Logout(w http.ResponseWriter, r *http.Request) {
+	var requestPayload struct {
+		Token string `json:"token"`
+	}
+
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, errors.New("invalid json"))
+		return
+	}
+
+	err = app.models.Token.DeleteByToken(requestPayload.Token)
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, errors.New("failed to delete token"))
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "logged out",
+	}
+
+	app.writeJSON(w, http.StatusOK, payload)
+}
