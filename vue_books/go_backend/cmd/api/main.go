@@ -1,6 +1,7 @@
 package main
 
 import (
+	"books_backend/internal/data"
 	"books_backend/internal/driver"
 	"fmt"
 	"log"
@@ -15,7 +16,7 @@ type config struct {
 
 type application struct {
 	config   config
-	db       *driver.DB
+	models   data.Models
 	infoLog  *log.Logger
 	errorLog *log.Logger
 }
@@ -36,7 +37,7 @@ func main() {
 
 	app := &application{
 		config:   cfg,
-		db:       db,
+		models:   data.New(db.SQL),
 		infoLog:  infoLog,
 		errorLog: errorLog,
 	}
