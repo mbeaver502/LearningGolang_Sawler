@@ -14,7 +14,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <router-link class="nav-link active" aria-current="page" to="/">
               Home
@@ -79,6 +79,9 @@ export default {
             });
 
             store.token = "";
+            store.user = {};
+            document.cookie =
+              "_site_data=; Path=/; SameSite=strict; Secure; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
             router.push("/login");
           }
         });
