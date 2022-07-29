@@ -1,6 +1,7 @@
 package main
 
 import (
+	"books_backend/internal/data"
 	"errors"
 	"net/http"
 	"time"
@@ -105,6 +106,26 @@ func (app *application) Logout(w http.ResponseWriter, r *http.Request) {
 	payload := jsonResponse{
 		Error:   false,
 		Message: "logged out",
+	}
+
+	app.writeJSON(w, http.StatusOK, payload)
+}
+
+// AllUsers gets all users.
+func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
+	var users data.User
+	all, err := users.GetAll()
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "success",
+		Data: envelope{
+			"users": all,
+		},
 	}
 
 	app.writeJSON(w, http.StatusOK, payload)
