@@ -31,12 +31,12 @@ const routes = [
     },
     {
         path: '/admin/books',
-        name: 'Books Admin',
+        name: 'BooksAdmin',
         component: BooksAdmin,
     },
     {
         path: '/admin/books/:bookId',
-        name: 'Book Edit',
+        name: 'BookEdit',
         component: BookEdit,
     },
     {
@@ -46,7 +46,7 @@ const routes = [
     },
     {
         path: '/admin/users/:userId',
-        name: 'User Edit',
+        name: 'UserEdit',
         component: UserEdit,
     },
 ];
