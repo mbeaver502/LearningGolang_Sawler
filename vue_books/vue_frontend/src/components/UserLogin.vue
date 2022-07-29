@@ -6,7 +6,8 @@
         <hr />
         <form-tag @myevent="submitHandler" name="myform" event="myevent">
           <text-input
-            v-model="email"
+            :value="email"
+            @update:value="(newValue) => (email = newValue)"
             label="Email"
             type="email"
             name="email"
@@ -15,7 +16,8 @@
           </text-input>
 
           <text-input
-            v-model="password"
+            :value="password"
+            @update:value="(newValue) => (password = newValue)"
             label="Password"
             type="password"
             name="password"
@@ -32,14 +34,14 @@
 </template>
 
 <script>
-import TextInput from "./forms/TextInput.vue";
 import FormTag from "./forms/FormTag.vue";
+import TextInput from "./forms/TextInput.vue";
 
 export default {
   name: "UserLogin",
   components: {
-    TextInput,
     FormTag,
+    TextInput,
   },
   data() {
     return {
@@ -49,7 +51,29 @@ export default {
   },
   methods: {
     submitHandler() {
-      console.log("submit handler fired");
+      console.log("submitHandler called - success!");
+
+      const payload = {
+        email: this.email,
+        password: this.password,
+      };
+
+      console.log(payload);
+
+      const requestOptions = {
+        method: "POST",
+        body: JSON.stringify(payload),
+      };
+
+      fetch("http://localhost:8081/users/login", requestOptions)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            console.log("Error:", data.message);
+          } else {
+            console.log(data);
+          }
+        });
     },
   },
 };

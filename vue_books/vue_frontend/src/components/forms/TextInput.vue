@@ -11,6 +11,7 @@
       :value="value"
       :autocomplete="name + '-new'"
       class="form-control"
+      @input="$emit('update:value', $event.target.value)"
     />
   </div>
 </template>
