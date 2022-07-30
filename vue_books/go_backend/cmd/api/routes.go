@@ -29,6 +29,8 @@ func (app *application) routes() http.Handler {
 	mux.Get("/books", app.AllBooks)
 	mux.Post("/books", app.AllBooks)
 
+	mux.Get("/books/{slug}", app.OneBook)
+
 	// protected routes, prefixed by /admin
 	mux.Route("/admin", func(mux chi.Router) {
 		mux.Use(app.AuthTokenMiddleware)
