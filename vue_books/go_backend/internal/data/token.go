@@ -56,7 +56,7 @@ func (t *Token) GetUserForToken(token Token) (*User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	query := `select id, email, first_name, last_name, password, created_at, updated_at from users where id = $1`
+	query := `select id, email, first_name, last_name, password, user_active, created_at, updated_at from users where id = $1`
 
 	var user User
 
@@ -67,6 +67,7 @@ func (t *Token) GetUserForToken(token Token) (*User, error) {
 		&user.FirstName,
 		&user.LastName,
 		&user.Password,
+		&user.Active,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -130,6 +131,10 @@ func (t *Token) AuthenticateToken(r *http.Request) (*User, error) {
 	user, err := t.GetUserForToken(*tkn)
 	if err != nil {
 		return nil, errors.New("no matching user found")
+	}
+
+	if user.Active == 0 {
+		return nil, errors.New("inactive user")
 	}
 
 	return user, nil
@@ -203,4 +208,19 @@ func (t *Token) ValidToken(plaintext string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+// DeleteTokensForUser deletes the tokens for the user with the given ID.
+func (t *Token) DeleteTokensForUser(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `delete from tokens where user_id = $1`
+
+	_, err := db.ExecContext(ctx, stmt, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
