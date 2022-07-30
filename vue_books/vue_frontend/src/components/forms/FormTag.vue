@@ -23,7 +23,7 @@ export default {
 
       // simplified bootstrap validation
       if (myForm.checkValidity()) {
-        this.$emit(this.$props.event);
+        this.$emit(this.$props["event"]);
       }
 
       myForm.classList.add("was-validated");
