@@ -2,12 +2,15 @@
   <Header />
   <div>
     <router-view
+      v-slot="{ Component }"
       :key="componentKey"
       @success="success"
       @error="error"
       @warning="warning"
       @forceUpdate="forceUpdate"
-    />
+    >
+      <keep-alive><component :is="Component" /></keep-alive>
+    </router-view>
   </div>
   <Footer />
 </template>

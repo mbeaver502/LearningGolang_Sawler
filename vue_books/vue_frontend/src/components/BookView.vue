@@ -35,7 +35,8 @@ export default {
       ready: false,
     };
   },
-  created() {
+  // ensure this keep-alive'd component gets the right data on page load
+  activated() {
     fetch(process.env.VUE_APP_API_URL + "/books/" + this.$route.params.bookName)
       .then((response) => response.json())
       .then((response) => {
