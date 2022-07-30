@@ -59,6 +59,28 @@
           help="Leave blank to keep existing password"
         ></text-input>
 
+        <div class="form-check">
+          <input
+            v-model="user.active"
+            class="form-check-input"
+            type="radio"
+            id="user-active"
+            :value="1"
+          />
+          <label class="form-check-label" for="user-active">Active</label>
+        </div>
+
+        <div class="form-check">
+          <input
+            v-model="user.active"
+            class="form-check-input"
+            type="radio"
+            id="user-active-2"
+            :value="0"
+          />
+          <label class="form-check-label" for="user-active-2">Inactive</label>
+        </div>
+
         <hr />
 
         <div class="float-start">
@@ -91,6 +113,7 @@ import FormTag from "./forms/FormTag.vue";
 import TextInput from "./forms/TextInput.vue";
 import notie from "notie";
 import { store } from "./store.js";
+import router from "./../router/index.js";
 
 export default {
   beforeMount() {
@@ -105,11 +128,7 @@ export default {
         .then((response) => response.json())
         .then((response) => {
           if (response.error) {
-            notie.alert({
-              type: "error",
-              text: response.message,
-              stay: true,
-            });
+            this.$emit("error", response.message);
           } else {
             this.user = response;
 
@@ -118,11 +137,7 @@ export default {
           }
         })
         .catch((error) => {
-          notie.alert({
-            type: "error",
-            text: error,
-            stay: true,
-          });
+          this.$emit("error", error);
         });
     }
   },
@@ -134,6 +149,7 @@ export default {
         last_name: "",
         email: "",
         password: "",
+        active: 0,
       },
       store,
     };
@@ -150,6 +166,7 @@ export default {
         last_name: this.user.last_name,
         email: this.user.email,
         password: this.user.password,
+        active: this.user.active,
       };
 
       fetch(
@@ -159,25 +176,14 @@ export default {
         .then((response) => response.json())
         .then((response) => {
           if (response.error) {
-            notie.alert({
-              type: "error",
-              text: response.message,
-              stay: true,
-            });
+            this.$emit("error", response.message);
           } else {
-            notie.alert({
-              type: "success",
-              text: "Changes saved!",
-              stay: true,
-            });
+            this.$emit("success", "Changes saved!");
+            router.push("/admin/users");
           }
         })
         .catch((error) => {
-          notie.alert({
-            type: "error",
-            text: error,
-            stay: true,
-          });
+          this.$emit("error", error);
         });
     },
     confirmDelete(id) {
@@ -185,8 +191,6 @@ export default {
         text: "Are you sure?",
         submitText: "Delete",
         submitCallback: function () {
-          console.log("deleting", id);
-
           const payload = {
             id: id,
           };
@@ -198,25 +202,11 @@ export default {
             .then((response) => response.json())
             .then((response) => {
               if (response.error) {
-                notie.alert({
-                  type: "error",
-                  text: response.message,
-                  stay: true,
-                });
+                this.$emit("error", response.message);
               } else {
-                notie.alert({
-                  type: "success",
-                  text: "Changes saved!",
-                  stay: true,
-                });
+                this.$emit("success", "Changes saved!");
+                router.push("/admin/users");
               }
-            })
-            .catch((error) => {
-              notie.alert({
-                type: "error",
-                text: error,
-                stay: true,
-              });
             });
         },
       });
