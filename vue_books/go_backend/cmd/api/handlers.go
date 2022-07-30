@@ -314,3 +314,22 @@ func (app *application) ValidateToken(w http.ResponseWriter, r *http.Request) {
 
 	app.writeJSON(w, http.StatusOK, payload)
 }
+
+// AllBooks returns all books.
+func (app *application) AllBooks(w http.ResponseWriter, r *http.Request) {
+	books, err := app.models.Book.GetAll()
+	if err != nil {
+		app.errorLog.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	payload := jsonResponse{
+		Error: false,
+		Data: envelope{
+			"books": books,
+		},
+	}
+
+	app.writeJSON(w, http.StatusOK, payload)
+}

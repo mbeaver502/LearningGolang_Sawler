@@ -26,6 +26,9 @@ func (app *application) routes() http.Handler {
 
 	mux.Post("/validate-token", app.ValidateToken)
 
+	mux.Get("/books", app.AllBooks)
+	mux.Post("/books", app.AllBooks)
+
 	// protected routes, prefixed by /admin
 	mux.Route("/admin", func(mux chi.Router) {
 		mux.Use(app.AuthTokenMiddleware)
@@ -36,6 +39,10 @@ func (app *application) routes() http.Handler {
 		mux.Post("/users/delete", app.DeleteUser)
 		mux.Post("/log-user-out/{id}", app.LogUserOutAndSetInactive)
 	})
+
+	// static file serving
+	fileServer := http.FileServer(http.Dir("./static/"))
+	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
 	return mux
 }
