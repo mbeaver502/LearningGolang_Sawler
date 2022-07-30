@@ -65,11 +65,13 @@
                   b.genre_ids.includes(currentFilter) || currentFilter === 0
                 "
               >
-                <img
-                  :src="`${this.imgPath}/covers/${b.slug}.jpg`"
-                  :alt="`cover for ${b.title}`"
-                  class="card-img-top"
-                />
+                <router-link :to="`/books/${b.slug}`">
+                  <img
+                    :src="`${this.imgPath}/covers/${b.slug}.jpg`"
+                    :alt="`cover for ${b.title}`"
+                    class="card-img-top"
+                  />
+                </router-link>
                 <div class="card-body text-center">
                   <h6 class="card-title">{{ b.title }}</h6>
                   <span class="book-author">{{ b.author.author_name }}</span
