@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="row">
+    <div v-if="ready" class="row">
       <div class="col-md-2">
         <img
           class="img-fluid img-thumbnail"
@@ -22,6 +22,7 @@
         </p>
       </div>
     </div>
+    <p v-else>Loading...</p>
   </div>
 </template>
 
@@ -31,6 +32,7 @@ export default {
     return {
       book: {},
       imgPath: process.env.VUE_APP_IMAGE_URL,
+      ready: false,
     };
   },
   created() {
@@ -41,6 +43,7 @@ export default {
           this.$emit("error", response.message);
         } else {
           this.book = response.data;
+          this.ready = true;
         }
       });
   },
