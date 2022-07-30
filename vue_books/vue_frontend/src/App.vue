@@ -9,7 +9,7 @@
       @warning="warning"
       @forceUpdate="forceUpdate"
     >
-      <keep-alive><component :is="Component" /></keep-alive>
+      <keep-alive include="BooksView"><component :is="Component" /></keep-alive>
     </router-view>
   </div>
   <Footer />

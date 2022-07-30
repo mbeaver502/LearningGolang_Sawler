@@ -17,17 +17,17 @@ const routes = [
     },
     {
         path: '/login',
-        name: 'Login',
+        name: 'UserLogin',
         component: UserLogin,
     },
     {
         path: '/books',
-        name: 'Books',
+        name: 'BooksView',
         component: BooksView,
     },
     {
         path: '/books/:bookName',
-        name: 'Book',
+        name: 'BookView',
         component: BookView,
     },
     {
@@ -42,7 +42,7 @@ const routes = [
     },
     {
         path: '/admin/users',
-        name: 'Users',
+        name: 'UsersView',
         component: UsersView,
     },
     {

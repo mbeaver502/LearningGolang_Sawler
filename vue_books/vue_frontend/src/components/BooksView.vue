@@ -102,6 +102,7 @@
 import { store } from "@/components/store.js";
 
 export default {
+  name: "BooksView",
   data() {
     return {
       store,

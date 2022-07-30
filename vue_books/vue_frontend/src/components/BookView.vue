@@ -28,6 +28,7 @@
 
 <script>
 export default {
+  name: "BookView",
   data() {
     return {
       book: {},
@@ -35,8 +36,7 @@ export default {
       ready: false,
     };
   },
-  // ensure this keep-alive'd component gets the right data on page load
-  activated() {
+  mounted() {
     fetch(process.env.VUE_APP_API_URL + "/books/" + this.$route.params.bookName)
       .then((response) => response.json())
       .then((response) => {

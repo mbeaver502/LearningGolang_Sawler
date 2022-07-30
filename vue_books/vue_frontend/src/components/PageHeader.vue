@@ -85,6 +85,7 @@ import router from "./../router/index.js";
 import notie from "notie";
 import Security from "./security.js";
 export default {
+  name: "PageHeader",
   data() {
     return {
       store,
