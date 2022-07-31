@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "authentication_service"
+		},
+		{
+			"path": "logger_service"
 		}
 	],
 	"settings": {
