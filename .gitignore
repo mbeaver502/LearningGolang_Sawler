@@ -15,3 +15,5 @@ hello-world-web/*
 vue_books/go_backend/vueapi
 microservices/broker_service/brokerApp
 microservices/frontend/frontApp
+microservices/project/db-data
+microservices/authentication_service/authApp
