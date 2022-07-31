@@ -130,7 +130,7 @@ func (app *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
-func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
+/* func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
 	// turn the log request into JSON we can send to Logger
 	jsonData, _ := json.Marshal(entry)
 
@@ -168,7 +168,7 @@ func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
 	}
 
 	app.writeJSON(w, http.StatusAccepted, payload)
-}
+} */
 
 func (app *Config) sendMail(w http.ResponseWriter, mail MailPayload) {
 	jsonData, _ := json.Marshal(mail)
