@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"listenerservice/event"
 	"log"
 	"math"
 	"time"
@@ -19,13 +20,21 @@ func main() {
 	}
 	defer rabbitConn.Close()
 
-	log.Println("*** Connected to RabbitMQ! ***")
-
 	// start listening for messages
+	log.Println("Listening for and consuming RabbitMQ messages...")
 
 	// create consumer
+	consumer, err := event.NewConsumer(rabbitConn)
+	if err != nil {
+		log.Panicln(err)
+	}
 
 	// watch the queue and consume events
+	topics := []string{"log.INFO", "log.WARNING", "log.ERROR"}
+	err = consumer.Listen(topics)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func connect() (*amqp.Connection, error) {
@@ -36,7 +45,7 @@ func connect() (*amqp.Connection, error) {
 
 	// don't continue until rabbitmq is ready
 	for {
-		c, err := amqp.Dial("amqp://guest:guest@localhost")
+		c, err := amqp.Dial("amqp://guest:guest@rabbitmq") // rabbitmq is the name of the service inside Docker
 		if err != nil {
 			log.Println("rabbitmq not yet ready")
 			counts++
@@ -55,6 +64,8 @@ func connect() (*amqp.Connection, error) {
 		log.Printf("backing off for %v seconds\n", backoff)
 		time.Sleep(backoff)
 	}
+
+	log.Println("*** Connected to RabbitMQ! ***")
 
 	return connection, nil
 }
