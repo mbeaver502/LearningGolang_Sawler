@@ -14,6 +14,7 @@ type RequestPayload struct {
 	Action string      `json:"action"`
 	Auth   AuthPayload `json:"auth,omitempty"`
 	Log    LogPayload  `json:"log,omitempty"`
+	Mail   MailPayload `json:"mail,omitempty"`
 }
 
 // AuthPayload represents the JSON for an authentication request.
@@ -26,6 +27,14 @@ type AuthPayload struct {
 type LogPayload struct {
 	Name string `json:"name"`
 	Data string `json:"data"`
+}
+
+// MailPayload represents the JSOn for a mail request.
+type MailPayload struct {
+	From    string `json:"from"`
+	To      string `json:"to"`
+	Subject string `json:"subject"`
+	Message string `json:"message"`
 }
 
 // Broker is a sample handler.
@@ -57,6 +66,8 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
 		app.logItem(w, requestPayload.Log)
+	case "mail":
+		app.sendMail(w, requestPayload.Mail)
 	default:
 		app.errorJSON(w, errors.New("unrecognized action"))
 	}
@@ -152,6 +163,45 @@ func (app *Config) logItem(w http.ResponseWriter, entry LogPayload) {
 	payload := jsonResponse{
 		Error:   false,
 		Message: "logged",
+	}
+
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) sendMail(w http.ResponseWriter, mail MailPayload) {
+	jsonData, _ := json.Marshal(mail)
+
+	// call the Mailer service
+	mailServiceURL := "http://mailer-service/send" // mailer-service is the name inside Docker
+	request, err := http.NewRequest("POST", mailServiceURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(request)
+	if err != nil {
+		log.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// ensure we got the right status code
+	if resp.StatusCode != http.StatusAccepted {
+		log.Printf("invalid status code: %d", resp.StatusCode)
+		app.errorJSON(w, fmt.Errorf("invalid status code: %d", resp.StatusCode))
+		return
+	}
+
+	// write a response back to the front-end
+	payload := jsonResponse{
+		Error:   false,
+		Message: fmt.Sprintf("mail sent to %s", mail.To),
 	}
 
 	app.writeJSON(w, http.StatusAccepted, payload)
