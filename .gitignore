@@ -13,3 +13,5 @@ websocket_vigilate/vigilate
 hello-world-web/*
 .DS_Store
 vue_books/go_backend/vueapi
+microservices/broker_service/brokerApp
+microservices/frontend/frontApp
