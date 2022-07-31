@@ -47,5 +47,5 @@ func (app *Config) SendMail(w http.ResponseWriter, r *http.Request) {
 		Message: fmt.Sprintf("email sent to %s", requestPayload.To),
 	}
 
-	app.writeJSON(w, http.StatusOK, payload)
+	app.writeJSON(w, http.StatusAccepted, payload)
 }
