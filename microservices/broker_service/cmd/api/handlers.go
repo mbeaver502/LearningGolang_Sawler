@@ -1,13 +1,13 @@
 package main
 
 import (
-	"broker/event"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"net/rpc"
 )
 
 // RequestPayload is the standard, expected JSON structure.
@@ -67,7 +67,8 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.authenticate(w, requestPayload.Auth)
 	case "log":
 		//app.logItem(w, requestPayload.Log)
-		app.logEventViaRabbit(w, requestPayload.Log)
+		// app.logEventViaRabbit(w, requestPayload.Log)
+		app.logItemViaRPC(w, requestPayload.Log)
 	case "mail":
 		app.sendMail(w, requestPayload.Mail)
 	default:
@@ -209,6 +210,7 @@ func (app *Config) sendMail(w http.ResponseWriter, mail MailPayload) {
 	app.writeJSON(w, http.StatusAccepted, payload)
 }
 
+/*
 func (app *Config) logEventViaRabbit(w http.ResponseWriter, l LogPayload) {
 	err := app.pushToQueue(l.Name, l.Data)
 	if err != nil {
@@ -250,4 +252,40 @@ func (app *Config) pushToQueue(name string, msg string) error {
 	}
 
 	return nil
+}
+*/
+
+type RPCPayload struct {
+	Name string
+	Data string
+}
+
+func (app *Config) logItemViaRPC(w http.ResponseWriter, l LogPayload) {
+	// logger-service is the name of the Logger service in Docker
+	// the Logger service program is set up to listen for RPC on Port 5001
+	client, err := rpc.Dial("tcp", "logger-service:5001")
+	if err != nil {
+		log.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	// what we'll send to the RPC listener
+	rpcPayload := RPCPayload{
+		Name: l.Name,
+		Data: l.Data,
+	}
+
+	var result string
+
+	// the serviceMethod name must match exactly
+	// the serviceMethod must be exported
+	err = client.Call("RPCServer.LogInfo", rpcPayload, &result)
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: result,
+	}
+
+	app.writeJSON(w, http.StatusAccept, payload)
 }
