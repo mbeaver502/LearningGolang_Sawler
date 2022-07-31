@@ -281,11 +281,16 @@ func (app *Config) logItemViaRPC(w http.ResponseWriter, l LogPayload) {
 	// the serviceMethod name must match exactly
 	// the serviceMethod must be exported
 	err = client.Call("RPCServer.LogInfo", rpcPayload, &result)
+	if err != nil {
+		log.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
 
 	payload := jsonResponse{
 		Error:   false,
 		Message: result,
 	}
 
-	app.writeJSON(w, http.StatusAccept, payload)
+	app.writeJSON(w, http.StatusAccepted, payload)
 }
