@@ -1,13 +1,19 @@
 package main
 
 import (
+	"broker/logs"
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"net/rpc"
+	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // RequestPayload is the standard, expected JSON structure.
@@ -290,6 +296,57 @@ func (app *Config) logItemViaRPC(w http.ResponseWriter, l LogPayload) {
 	payload := jsonResponse{
 		Error:   false,
 		Message: result,
+	}
+
+	app.writeJSON(w, http.StatusAccepted, payload)
+}
+
+// LogViaGRPC will log something to Mongo via a gRPC request.
+func (app *Config) LogViaGRPC(w http.ResponseWriter, r *http.Request) {
+	var requestPayload RequestPayload
+
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		log.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	// logger-service is the name of the service running inside Docker
+	// Logger is listening for gRPC on port 50001
+	conn, err := grpc.Dial("logger-service:50001", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	if err != nil {
+		log.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+	defer conn.Close()
+
+	// set up a new client that is designed specifically for logs
+	// based on the logs.proto
+	c := logs.NewLogServiceClient(conn)
+
+	// get a context for our gRPC
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	// try to write to the log by executing a gRPC
+	_, err = c.WriteLog(ctx, &logs.LogRequest{
+		LogEntry: &logs.Log{
+			Name: requestPayload.Log.Name,
+			Data: requestPayload.Log.Data,
+		},
+	})
+	if err != nil {
+		log.Println(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	// write back a response
+	payload := jsonResponse{
+		Error:   false,
+		Message: "logged via gRPC",
 	}
 
 	app.writeJSON(w, http.StatusAccepted, payload)
