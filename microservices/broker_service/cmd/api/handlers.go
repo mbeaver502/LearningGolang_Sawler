@@ -277,10 +277,11 @@ func (app *Config) logItemViaRPC(w http.ResponseWriter, l LogPayload) {
 	}
 
 	// what we'll send to the RPC listener
-	rpcPayload := RPCPayload{
-		Name: l.Name,
-		Data: l.Data,
-	}
+	// rpcPayload := RPCPayload{
+	// 	Name: l.Name,
+	// 	Data: l.Data,
+	// }
+	rpcPayload := RPCPayload(l)
 
 	var result string
 
