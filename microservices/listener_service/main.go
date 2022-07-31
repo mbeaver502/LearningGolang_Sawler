@@ -61,7 +61,7 @@ func connect() (*amqp.Connection, error) {
 
 		// exponential backoff
 		backoff = time.Duration(math.Pow(float64(counts), 2)) * time.Second
-		log.Printf("backing off for %v seconds\n", backoff)
+		log.Printf("backing off for %v\n", backoff)
 		time.Sleep(backoff)
 	}
 
