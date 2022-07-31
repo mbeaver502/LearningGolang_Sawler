@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "project"
+		},
+		{
+			"path": "authentication_service"
 		}
 	],
 	"settings": {
