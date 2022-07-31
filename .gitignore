@@ -19,3 +19,4 @@ microservices/project/db-data
 microservices/authentication_service/authApp
 microservices/logger_service/loggerApp
 microservices/mail_service/mailerApp
+microservices/listener_service/listenerApp
