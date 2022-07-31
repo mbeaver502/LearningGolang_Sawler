@@ -16,7 +16,7 @@ const (
 	webPort  = "80"
 	rpcPort  = "5001"
 	grpcPort = "50001"
-	mongoURL = "mongodb://mongo:27017"
+	mongoURL = "mongodb://mongo:27017" // mongo is the name of the service running inside Docker
 )
 
 var client *mongo.Client
@@ -26,6 +26,8 @@ type Config struct {
 }
 
 func main() {
+	log.Printf("Logger listening on port %s\n", webPort)
+
 	// connect to mongo
 	mongoClient, err := connectToMongo()
 	if err != nil {
@@ -49,20 +51,29 @@ func main() {
 	}
 
 	// start the Web server
-	go app.serve()
-}
-
-func (app *Config) serve() {
+	// go app.serve()
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
 	}
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Panic(err)
 	}
 }
+
+// func (app *Config) serve() {
+// 	srv := &http.Server{
+// 		Addr:    fmt.Sprintf(":%s", webPort),
+// 		Handler: app.routes(),
+// 	}
+
+// 	err := srv.ListenAndServe()
+// 	if err != nil {
+// 		log.Panic(err)
+// 	}
+// }
 
 func connectToMongo() (*mongo.Client, error) {
 	// create connection options
@@ -78,6 +89,8 @@ func connectToMongo() (*mongo.Client, error) {
 		log.Println(err)
 		return nil, err
 	}
+
+	log.Println("*** Connected to Mongo! ***")
 
 	return c, nil
 }
