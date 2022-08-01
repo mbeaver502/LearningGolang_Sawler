@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "markdown"
+		},
+		{
+			"path": "goldwatcher"
 		}
 	],
 	"settings": {}
