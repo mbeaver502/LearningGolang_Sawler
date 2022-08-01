@@ -25,7 +25,7 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validate that the user actually exists
-	user, err := app.Models.User.GetByEmail(requestPayload.Email)
+	user, err := app.Repo.GetByEmail(requestPayload.Email)
 	if err != nil {
 		log.Println(err)
 		app.errorJSON(w, errors.New("invalid credentials"), http.StatusBadRequest)
@@ -33,7 +33,7 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validate the user's password
-	valid, err := user.PasswordMatches(requestPayload.Password)
+	valid, err := app.Repo.PasswordMatches(requestPayload.Password, *user)
 	if !valid || err != nil {
 		log.Println(err)
 		app.errorJSON(w, errors.New("invalid credentials"), http.StatusBadRequest)
