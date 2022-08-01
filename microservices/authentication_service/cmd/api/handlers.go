@@ -82,8 +82,7 @@ func (app *Config) logRequest(name string, data string) error {
 	}
 
 	// attempt to call Logger service with request
-	client := &http.Client{}
-	_, err = client.Do(request)
+	_, err = app.Client.Do(request)
 	if err != nil {
 		log.Println(err)
 		return err
