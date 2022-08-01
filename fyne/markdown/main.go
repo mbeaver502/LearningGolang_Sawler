@@ -25,6 +25,7 @@ func main() {
 
 	// get the user interface for the window
 	edit, preview := cfg.makeUI()
+	cfg.createMenuItems(win)
 
 	// set the contents of the window
 	// editor on left, preview on right
@@ -52,4 +53,21 @@ func (app *config) makeUI() (*widget.Entry, *widget.RichText) {
 	edit.OnChanged = preview.ParseMarkdown
 
 	return edit, preview
+}
+
+func (app *config) createMenuItems(win fyne.Window) {
+	openMenuItem := fyne.NewMenuItem("Open...", func() {})
+
+	saveMenuItem := fyne.NewMenuItem("Save", func() {})
+
+	saveAsMenuItem := fyne.NewMenuItem("Save As...", func() {})
+
+	// File
+	//	Open...
+	//	Save
+	//	Save As...
+	fileMenu := fyne.NewMenu("File", openMenuItem, saveMenuItem, saveAsMenuItem)
+
+	mainMenu := fyne.NewMainMenu(fileMenu)
+	win.SetMainMenu(mainMenu)
 }
