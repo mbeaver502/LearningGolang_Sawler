@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "hello_world"
+		},
+		{
+			"path": "markdown"
 		}
 	],
 	"settings": {}
