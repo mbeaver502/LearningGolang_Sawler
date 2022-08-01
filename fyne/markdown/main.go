@@ -64,7 +64,7 @@ func (app *config) makeUI() (*widget.Entry, *widget.RichText) {
 func (app *config) createMenuItems(win fyne.Window) {
 	openMenuItem := fyne.NewMenuItem("Open...", app.openFunc(win))
 
-	saveMenuItem := fyne.NewMenuItem("Save", func() {})
+	saveMenuItem := fyne.NewMenuItem("Save", app.saveFunc(win))
 	app.SaveMenuItem = saveMenuItem
 	app.SaveMenuItem.Disabled = true
 
@@ -100,7 +100,11 @@ func (app *config) saveAsFunc(win fyne.Window) func() {
 			}
 
 			// save the edit widget's text to file
-			write.Write([]byte(app.EditWidget.Text))
+			_, writeErr := write.Write([]byte(app.EditWidget.Text))
+			if writeErr != nil {
+				dialog.ShowError(writeErr, win)
+				return
+			}
 			defer write.Close()
 
 			// set the window title to Markdown - Filename
@@ -151,5 +155,26 @@ func (app *config) openFunc(win fyne.Window) func() {
 
 		openDialog.SetFilter(storage.NewExtensionFileFilter([]string{".md", ".MD"}))
 		openDialog.Show()
+	}
+}
+
+func (app *config) saveFunc(win fyne.Window) func() {
+	return func() {
+		if app.CurrentFile == nil {
+			return
+		}
+
+		write, err := storage.Writer(app.CurrentFile)
+		if err != nil {
+			dialog.ShowError(err, win)
+			return
+		}
+		defer write.Close()
+
+		_, writeErr := write.Write([]byte(app.EditWidget.Text))
+		if writeErr != nil {
+			dialog.ShowError(writeErr, win)
+			return
+		}
 	}
 }
