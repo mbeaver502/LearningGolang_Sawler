@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -59,7 +62,7 @@ func (app *config) makeUI() (*widget.Entry, *widget.RichText) {
 }
 
 func (app *config) createMenuItems(win fyne.Window) {
-	openMenuItem := fyne.NewMenuItem("Open...", func() {})
+	openMenuItem := fyne.NewMenuItem("Open...", app.openFunc(win))
 
 	saveMenuItem := fyne.NewMenuItem("Save", func() {})
 	app.SaveMenuItem = saveMenuItem
@@ -91,6 +94,11 @@ func (app *config) saveAsFunc(win fyne.Window) func() {
 				return
 			}
 
+			if strings.ToLower(write.URI().Extension()) != ".md" {
+				dialog.ShowInformation("Invalid File", "File is of wrong type.", win)
+				return
+			}
+
 			// save the edit widget's text to file
 			write.Write([]byte(app.EditWidget.Text))
 			defer write.Close()
@@ -102,6 +110,46 @@ func (app *config) saveAsFunc(win fyne.Window) func() {
 			app.SaveMenuItem.Disabled = false
 		}, win)
 
+		saveDialog.SetFileName("untitled.md")
+		saveDialog.SetFilter(storage.NewExtensionFileFilter([]string{".md", ".MD"}))
 		saveDialog.Show()
+	}
+}
+
+func (app *config) openFunc(win fyne.Window) func() {
+	return func() {
+		openDialog := dialog.NewFileOpen(func(read fyne.URIReadCloser, err error) {
+			if err != nil {
+				dialog.ShowError(err, win)
+				return
+			}
+
+			if read == nil {
+				return
+			}
+
+			if strings.ToLower(read.URI().Extension()) != ".md" {
+				dialog.ShowInformation("Invalid File", "File is of wrong type.", win)
+				return
+			}
+
+			defer read.Close()
+
+			data, err := io.ReadAll(read)
+			if err != nil {
+				dialog.ShowError(err, win)
+				return
+			}
+
+			app.EditWidget.SetText(string(data))
+
+			app.CurrentFile = read.URI()
+			win.SetTitle(fmt.Sprintf("%s - %s", win.Title(), app.CurrentFile.Name()))
+
+			app.SaveMenuItem.Disabled = false
+		}, win)
+
+		openDialog.SetFilter(storage.NewExtensionFileFilter([]string{".md", ".MD"}))
+		openDialog.Show()
 	}
 }
