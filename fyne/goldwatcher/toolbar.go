@@ -12,7 +12,9 @@ func (app *Config) getToolbar() *widget.Toolbar {
 		// pencil button
 		widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {}),
 		// refresh button
-		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() {}),
+		widget.NewToolbarAction(theme.ViewRefreshIcon(), func() {
+			app.refreshPriceContent()
+		}),
 		// settings cog button
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {}),
 	)
