@@ -27,7 +27,13 @@ func (repo *TestRepository) AllHoldings() ([]Holdings, error) {
 		Amount:        1,
 		PurchaseDate:  time.Now(),
 		PurchasePrice: 1,
-	}}, nil
+	},
+		{
+			ID:            2,
+			Amount:        5,
+			PurchaseDate:  time.Now(),
+			PurchasePrice: 300,
+		}}, nil
 }
 
 func (repo *TestRepository) GetHoldingByID(id int64) (*Holdings, error) {
