@@ -17,6 +17,7 @@ type Config struct {
 	MainWindow     fyne.Window
 	PriceContainer *fyne.Container
 	Toolbar        *widget.Toolbar
+	ChartContainer *fyne.Container
 	HTTPClient     *http.Client
 }
 

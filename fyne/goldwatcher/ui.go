@@ -18,9 +18,11 @@ func (app *Config) makeUI() {
 	toolbar := app.getToolbar()
 	app.Toolbar = toolbar
 
+	priceTabContent := app.pricesTab()
+
 	// get tabs
 	tabs := container.NewAppTabs(
-		container.NewTabItemWithIcon("Prices", theme.HomeIcon(), canvas.NewText("price content goes here...", nil)),
+		container.NewTabItemWithIcon("Prices", theme.HomeIcon(), priceTabContent),
 		container.NewTabItemWithIcon("Holdings", theme.InfoIcon(), canvas.NewText("holdings content goes here...", nil)),
 	)
 	tabs.SetTabLocation(container.TabLocationTop)
