@@ -12,6 +12,7 @@ func (app *Config) makeUI() {
 
 	// get toolbar
 	toolbar := app.getToolbar()
+	app.Toolbar = toolbar
 
 	// add container to window
 	finalContent := container.NewVBox(
