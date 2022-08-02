@@ -12,6 +12,8 @@ func (app *Config) getPriceText() (*canvas.Text, *canvas.Text, *canvas.Text) {
 	var g Gold
 	var open, current, change *canvas.Text
 
+	g.Client = app.HTTPClient
+
 	p, err := g.GetPrices()
 	if err != nil {
 		app.ErrorLog.Println(err)

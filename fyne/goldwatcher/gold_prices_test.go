@@ -1,21 +1,10 @@
 package main
 
 import (
-	"bytes"
-	"io"
-	"net/http"
 	"testing"
 )
 
 func TestGold_GetPrices(t *testing.T) {
-	client := NewTestClient(func(req *http.Request) *http.Response {
-		return &http.Response{
-			StatusCode: http.StatusOK,
-			Header:     make(http.Header),
-			Body:       io.NopCloser(bytes.NewBuffer([]byte(jsonToReturn))),
-		}
-	})
-
 	g := Gold{
 		Prices: nil,
 		Client: client,

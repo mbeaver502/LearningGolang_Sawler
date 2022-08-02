@@ -1,15 +1,28 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"net/http"
 	"os"
 	"testing"
+
+	"fyne.io/fyne/v2/test"
 )
 
 var testApp Config
 
-func TestMain(m *testing.M) {
+var client = NewTestClient(func(req *http.Request) *http.Response {
+	return &http.Response{
+		StatusCode: http.StatusOK,
+		Header:     make(http.Header),
+		Body:       io.NopCloser(bytes.NewBuffer([]byte(jsonToReturn))),
+	}
+})
 
+func TestMain(m *testing.M) {
+	testApp.App = test.NewApp()
+	testApp.HTTPClient = client
 	os.Exit(m.Run())
 }
 
