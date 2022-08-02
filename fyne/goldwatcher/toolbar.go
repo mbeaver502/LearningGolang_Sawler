@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
-func (app *Config) getToolbar(win fyne.Window) *widget.Toolbar {
+func (app *Config) getToolbar() *widget.Toolbar {
 	toolbar := widget.NewToolbar(
 		// horizontal spacer, starting at left
 		widget.NewToolbarSpacer(),
