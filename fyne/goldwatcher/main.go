@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"goldwatcher/repository"
 	"log"
 	"net/http"
 	"os"
@@ -8,12 +10,14 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/widget"
+	_ "github.com/glebarez/go-sqlite"
 )
 
 type Config struct {
 	App            fyne.App
 	InfoLog        *log.Logger
 	ErrorLog       *log.Logger
+	DB             repository.Repository
 	MainWindow     fyne.Window
 	PriceContainer *fyne.Container
 	Toolbar        *widget.Toolbar
@@ -21,9 +25,9 @@ type Config struct {
 	HTTPClient     *http.Client
 }
 
-var myApp Config
-
 func main() {
+	var myApp Config
+
 	// create a fyne app
 	myApp.App = app.NewWithID("com.example.goldwatcher.preferences")
 
@@ -34,7 +38,14 @@ func main() {
 	myApp.HTTPClient = &http.Client{}
 
 	// open a connection to database (SQLite)
+	sqlDB, err := myApp.connectSQL()
+	if err != nil {
+		myApp.ErrorLog.Panic(err)
+	}
+	defer sqlDB.Close()
+
 	// create a database repository
+	myApp.setupDB(sqlDB)
 
 	// create and size a fyne window
 	myApp.MainWindow = myApp.App.NewWindow("GoldWatcher")
@@ -48,4 +59,32 @@ func main() {
 
 	// show and run app
 	myApp.MainWindow.ShowAndRun()
+}
+
+func (app *Config) connectSQL() (*sql.DB, error) {
+	path := ""
+
+	envPath := os.Getenv("DB_PATH")
+	if envPath != "" {
+		path = envPath
+	} else {
+		path = app.App.Storage().RootURI().Path() + "/sql.db"
+		app.InfoLog.Println("saving DB to:", path)
+	}
+
+	db, err := sql.Open("sqlite", path)
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
+
+func (app *Config) setupDB(sqlDB *sql.DB) {
+	app.DB = repository.NewSQLiteRepository(sqlDB)
+
+	err := app.DB.Migrate()
+	if err != nil {
+		app.ErrorLog.Panic(err)
+	}
 }
