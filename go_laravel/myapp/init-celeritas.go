@@ -21,7 +21,8 @@ func initApplication() *application {
 	}
 
 	c.AppName = "myapp"
-	c.Debug = true
+
+	c.InfoLog.Println("hello world!")
 
 	return &application{
 		App: c,
