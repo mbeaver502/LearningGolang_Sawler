@@ -21,3 +21,5 @@ microservices/logger_service/loggerApp
 microservices/mail_service/mailerApp
 microservices/listener_service/listenerApp
 fyne/goldwatcher/repository/testdata/
+fyne/goldwatcher/gold.png
+fyne/goldwatcher/sql.db
