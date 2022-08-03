@@ -19,6 +19,12 @@ type Celeritas struct {
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
 	RootPath string
+	config   config
+}
+
+type config struct {
+	port     string
+	renderer string
 }
 
 // New sets up a new Celeritas value.
@@ -62,6 +68,11 @@ func (c *Celeritas) New(rootPath string) error {
 	}
 
 	c.Version = version
+	c.RootPath = rootPath
+	c.config = config{
+		port:     os.Getenv("PORT"),
+		renderer: os.Getenv("RENDERER"),
+	}
 
 	return nil
 }
