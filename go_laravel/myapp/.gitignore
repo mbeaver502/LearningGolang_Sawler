@@ -1,0 +1,9 @@
+data/
+handlers/
+logs/
+middleware/
+migrations/
+public/
+tmp/
+vendor/
+views/
