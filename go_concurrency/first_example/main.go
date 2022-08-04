@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"sync"
 )
 
@@ -34,5 +33,5 @@ func main() {
 
 func printSomething(s string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	log.Println(s)
+	fmt.Println(s)
 }
