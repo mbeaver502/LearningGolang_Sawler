@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+	"github.com/mbeaver502/LearningGolang_Sawler/go_laravel/celeritas/render"
 )
 
 const version = "1.0.0"
@@ -23,6 +24,7 @@ type Celeritas struct {
 	InfoLog  *log.Logger
 	RootPath string
 	Routes   *chi.Mux
+	Renderer *render.Render
 	config   config
 }
 
@@ -74,6 +76,7 @@ func (c *Celeritas) New(rootPath string) error {
 	c.Version = version
 	c.RootPath = rootPath
 	c.Routes = c.routes().(*chi.Mux)
+	c.Renderer = c.createRenderer()
 
 	c.config = config{
 		port:     os.Getenv("PORT"),
@@ -134,4 +137,14 @@ func (c *Celeritas) startLoggers() (*log.Logger, *log.Logger) {
 	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	return infoLog, errorLog
+}
+
+func (c *Celeritas) createRenderer() *render.Render {
+	return &render.Render{
+		Renderer:   c.config.renderer,
+		RootPath:   c.RootPath,
+		Secure:     false,
+		Port:       c.config.port,
+		ServerName: "",
+	}
 }
